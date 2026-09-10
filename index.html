@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tipificación 2284 - Gestor de PDFs</title>
+    <!-- Librerías -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f7fc;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: #1e293b;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .app {
+            max-width: 1500px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.08);
+            padding: 1.5rem 1.8rem;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e9edf4;
+            padding-bottom: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: #0b3b5c;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .header-title h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0b2a40;
+        }
+
+        .header-title p {
+            font-size: 0.8rem;
+            color: #5b6f88;
+            margin-top: 2px;
+        }
+
+        .header-badge {
+            background: #eef3f9;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #1f4a6e;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .app {
+                padding: 1rem;
+            }
+        }
+
+        .types-panel {
+            background: #fafcff;
+            border: 1px solid #e5ebf3;
+            border-radius: 16px;
+            padding: 1rem;
+            height: fit-content;
+            position: sticky;
+            top: 1rem;
+        }
+
+        .types-panel h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0b2a40;
+            margin-bottom: 0.6rem;
+        }
+
+        .type-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.3rem 0.6rem;
+            margin-bottom: 0.2rem;
+            border: 1px solid #dce5f0;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1f3a57;
+            cursor: default;
+        }
+
+        .type-btn .count {
+            float: right;
+            background: #e6edf6;
+            padding: 0 0.4rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            color: #1f4a6e;
+        }
+
+        .type-btn .color-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .nit-factura-fields {
+            margin-top: 1.2rem;
+            border-top: 1px solid #e5ebf3;
+            padding-top: 0.8rem;
+        }
+
+        .nit-factura-fields label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #3a5778;
+            margin-top: 0.4rem;
+        }
+
+        .nit-factura-fields input {
+            width: 100%;
+            padding: 0.3rem 0.5rem;
+            border: 1px solid #d0dbe9;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 0.1rem;
+        }
+
+        .nit-factura-fields .btn-generate {
+            margin-top: 0.8rem;
+            width: 100%;
+            padding: 0.5rem;
+            background: #1b6b4a;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .nit-factura-fields .btn-generate:hover {
+            background: #1f7f58;
+        }
+
+        .nit-factura-fields .btn-clear {
+            width: 100%;
+            margin-top: 0.4rem;
+            padding: 0.4rem;
+            background: transparent;
+            border: 1px solid #c4d2e2;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #5b6f88;
+            transition: background 0.15s;
+            font-size: 0.8rem;
+        }
+
+        .nit-factura-fields .btn-clear:hover {
+            background: #f0f6fe;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .viewer-container {
+            background: #f1f6fb;
+            border-radius: 16px;
+            border: 1px solid #dce5f0;
+            padding: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .viewer-container canvas {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            background: white;
+        }
+
+        .viewer-container .no-pdf-msg {
+            color: #8b9eb5;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .viewer-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .viewer-controls button {
+            background: white;
+            border: 1px solid #cbd7e6;
+            border-radius: 30px;
+            padding: 0.15rem 0.7rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .viewer-controls button:hover {
+            background: #e8f0fa;
+        }
+
+        .viewer-controls .page-indicator {
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: #1f3a57;
+        }
+
+        .viewer-controls input[type="number"] {
+            width: 50px;
+            padding: 0.15rem 0.2rem;
+            border: 1px solid #cbd7e6;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .viewer-controls .doc-name {
+            font-weight: 500;
+            color: #0b2a40;
+            margin-right: 0.3rem;
+            font-size: 0.8rem;
+        }
+
+        .viewer-controls .zoom-btn {
+            background: #0b3b5c;
+            color: white;
+            border: none;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .viewer-controls .zoom-btn:hover {
+            background: #1a5270;
+        }
+
+        .gallery {
+            background: #fafcff;
+            border: 1px solid #e5ebf3;
+            border-radius: 16px;
+            padding: 0.8rem;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .gallery-header .title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #0b2a40;
+        }
+
+        .gallery-header .dropzone-small {
+            border: 1px dashed #cbd7e6;
+            border-radius: 30px;
+            padding: 0.15rem 0.8rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #4b6483;
+            transition: background 0.15s;
+        }
+
+        .gallery-header .dropzone-small:hover {
+            background: #eef3f9;
+        }
+
+        .gallery-header .dropzone-small input {
+            display: none;
+        }
+
+        .bulk-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            margin: 0.4rem 0 0.6rem;
+        }
+
+        .bulk-actions select {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #d0dbe9;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            background: white;
+        }
+
+        .bulk-actions .btn {
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .bulk-actions .btn-primary {
+            background: #0b3b5c;
+            color: white;
+        }
+
+        .bulk-actions .btn-primary:hover {
+            background: #1a5270;
+        }
+
+        .bulk-actions .btn-outline {
+            background: transparent;
+            border: 1px solid #c4d2e2;
+            color: #1f3a57;
+        }
+
+        .bulk-actions .btn-outline:hover {
+            background: #f0f6fe;
+        }
+
+        .thumbnails {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            max-height: 260px;
+            overflow-y: auto;
+            padding: 0.3rem 0;
+        }
+
+        .thumb-item {
+            width: 100px;
+            border: 2px solid #e5ebf3;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border 0.15s, transform 0.1s;
+            background: white;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .thumb-item:hover {
+            border-color: #7f9fc7;
+            transform: scale(1.02);
+        }
+
+        .thumb-item.selected {
+            border-color: #0b3b5c;
+            box-shadow: 0 0 0 2px #0b3b5c;
+        }
+
+        .thumb-item.tipo-asignado {
+            border-color: #1b6b4a;
+            background: #f0faf5;
+        }
+
+        .thumb-item .thumb-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #f1f6fb;
+        }
+
+        .thumb-item .thumb-label {
+            padding: 0.2rem 0.2rem;
+            font-size: 0.55rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: #f8faff;
+            border-top: 1px solid #e5ebf3;
+            text-align: center;
+            font-weight: 500;
+            color: #1f3a57;
+        }
+
+        .thumb-item .thumb-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #0b3b5c;
+            color: white;
+            font-size: 0.5rem;
+            padding: 0.05rem 0.3rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .thumb-item .thumb-remove {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            background: rgba(200, 50, 50, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 9px;
+            line-height: 1;
+            cursor: pointer;
+            display: none;
+        }
+
+        .thumb-item:hover .thumb-remove {
+            display: block;
+        }
+
+        .thumb-item .thumb-remove:hover {
+            background: #a33;
+        }
+
+        .thumb-item .thumb-check {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            accent-color: #0b3b5c;
+            cursor: pointer;
+        }
+
+        .gallery-footer {
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #5b6f88;
+            border-top: 1px solid #e9edf4;
+            padding-top: 0.4rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .thumbnails::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .thumbnails::-webkit-scrollbar-thumb {
+            background: #cbd7e6;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">📋</div>
+                <div class="header-title">
+                    <h1>Tipificación 2284</h1>
+                    <p>Separación de soportes de cobro · Resolución 2284 de 2020</p>
+                </div>
+            </div>
+            <div class="header-badge">Anexo 2 · HEV · EPI · PDX · DQX · RAN · CRC · TAP · TNA · FAT · FMO · OPF · LDP ·
+                HAU · HAO · HAM</div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Panel izquierdo: Tipos informativos con colores -->
+            <div class="types-panel">
+                <h3>📌 Asignar tipo</h3>
+                <div id="typeButtons"></div>
+                <div class="nit-factura-fields">
+                    <label>NIT</label>
+                    <input type="text" id="nitInput" value="819003863" />
+                    <label>N° Factura</label>
+                    <input type="text" id="facturaInput" value="PREV11100" />
+                    <button class="btn-generate" id="generarBtn">📦 Generar ZIP</button>
+                    <button class="btn-clear" id="limpiarBtn">🗑️ Limpiar todo</button>
+                </div>
+            </div>
+
+            <!-- Panel derecho -->
+            <div class="right-panel">
+                <!-- Visor con navegación y zoom -->
+                <div class="viewer-container" id="viewerContainer">
+                    <canvas id="viewerCanvas"></canvas>
+                    <div class="no-pdf-msg" id="noPdfMsg">Selecciona una página para visualizarla</div>
+                    <div class="viewer-controls" id="viewerControls" style="display:none;">
+                        <span class="doc-name" id="viewerDocName"></span>
+                        <button id="prevPageBtn">◀</button>
+                        <span class="page-indicator">Pág. <span id="currentPageNum">1</span> / <span
+                                id="totalPagesNum">1</span></span>
+                        <button id="nextPageBtn">▶</button>
+                        <input type="number" id="goToPageInput" min="1" value="1" />
+                        <button id="goToPageBtn">Ir</button>
+                        <button class="zoom-btn" id="zoomOutBtn">−</button>
+                        <span id="zoomLevel" style="font-size:0.8rem;">100%</span>
+                        <button class="zoom-btn" id="zoomInBtn">+</button>
+                    </div>
+                </div>
+
+                <!-- Galería con selector y botones de asignación -->
+                <div class="gallery">
+                    <div class="gallery-header">
+                        <span class="title">📎 Páginas (vista unificada)</span>
+                        <div class="dropzone-small" id="dropzoneGallery">
+                            <span>➕ Agregar PDFs</span>
+                            <input type="file" id="fileInput" accept=".pdf" multiple />
+                        </div>
+                    </div>
+                    <div class="bulk-actions">
+                        <span style="font-size:0.8rem; font-weight:500;">Asignar tipo a seleccionadas:</span>
+                        <select id="bulkTypeSelect">
+                            <option value="">-- Elegir --</option>
+                            <option value="HEV">RESUMEN DE ATENCIÓN U HOJA DE EVOLUCIÓN(HEV)</option>
+                            <option value="EPI">EPICRISIS(EPI)</option>
+                            <option value="PDX">RESULTADO DE LOS PROCEDIMIENTOS DE APOYO DIAGNOSTICO(PDX)</option>
+                            <option value="DQX">DESCRIPCIÓN QUIRURGICA(DQX)</option>
+                            <option value="RAN">REGISTRO DE ANESTESIA(RAN)</option>
+                            <option value="CRC">COMPROBANTE DE RECIBIDO DEL USUARIO(CRC)</option>
+                            <option value="TAP">TRASLADO ASISTENCIAL DE PACIENTES(TAP)</option>
+                            <option value="TNA">TRANSPORTE NO ASISTENCIAL AMBULATORIO DE LA PERSONA(TNA)</option>
+                            <option value="FAT">FACTURA DE VENTA(FAT)</option>
+                            <option value="FMO">FACTURA DE VENTA DE MATERIALES DE OSTEOSISTESIS(FMO)</option>
+                            <option value="OPF">ORDEN O PRESCRIPCIÓN FACULTATIVA(OPF)</option>
+                            <option value="LDP">LISTA DE PRECIOS(LDP)</option>
+                            <option value="HAU">HOJA DE ATENCIÓN DE URGENCIAS(HAU)</option>
+                            <option value="HAO">HOJA DE ANTECIÓN ONDONTOLÓGICA(HAO)</option>
+                            <option value="HAM">HOJA DE ADMON MEDICAMENTOS(HAM)</option>
+                        </select>
+                        <button class="btn btn-primary" id="applyBulkTypeBtn">Aplicar</button>
+                        <button class="btn btn-outline" id="clearSelectionsBtn">Limpiar selección</button>
+                    </div>
+                    <div class="thumbnails" id="thumbnailsContainer"></div>
+                    <div class="gallery-footer">
+                        <span id="totalDocs">0 páginas</span>
+                        <span id="assignedStats">0 asignadas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer"
+            style="margin-top:1.5rem; border-top:1px solid #e9edf4; padding-top:0.8rem; font-size:0.75rem; color:#7a8fa6; text-align:center;">
+            Herramienta de tipificación · Resolución 2284 de 2020 · Ministerio de Salud Colombia
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        (function () {
+            // Colores para cada tipo (para el badge y el indicador)
+            const TYPE_COLORS = {
+                'HEV': '#e74c3c',  // rojo
+                'EPI': '#3498db',  // azul
+                'PDX': '#2ecc71',  // verde
+                'DQX': '#f39c12',  // naranja
+                'RAN': '#9b59b6',  // morado
+                'CRC': '#1abc9c',  // turquesa
+                'TAP': '#e67e22',  // naranja oscuro
+                'TNA': '#2c3e50',  // gris oscuro
+                'FAT': '#e84393',  // rosado
+                'FMO': '#00b894',  // verde menta
+                'OPF': '#6c5ce7',  // índigo
+                'LDP': '#fd79a8',  // rosa
+                'HAU': '#00cec9',  // cian
+                'HAO': '#fdcb6e',  // amarillo
+                'HAM': '#a29bfe'   // lavanda
+            };
+
+            const TIPOS = ['HEV', 'EPI', 'PDX', 'DQX', 'RAN', 'CRC', 'TAP', 'TNA', 'FAT', 'FMO', 'OPF', 'LDP', 'HAU', 'HAO', 'HAM'];
+
+            let pages = [];
+            let selectedPageId = null;
+            let currentPageId = null;
+            let nextId = 1;
+            let zoomScale = 1.0;
+
+            // DOM
+            const typeButtonsDiv = document.getElementById('typeButtons');
+            const viewerCanvas = document.getElementById('viewerCanvas');
+            const ctx = viewerCanvas.getContext('2d');
+            const noPdfMsg = document.getElementById('noPdfMsg');
+            const viewerControls = document.getElementById('viewerControls');
+            const viewerDocName = document.getElementById('viewerDocName');
+            const currentPageNum = document.getElementById('currentPageNum');
+            const totalPagesNum = document.getElementById('totalPagesNum');
+            const prevPageBtn = document.getElementById('prevPageBtn');
+            const nextPageBtn = document.getElementById('nextPageBtn');
+            const goToPageInput = document.getElementById('goToPageInput');
+            const goToPageBtn = document.getElementById('goToPageBtn');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const zoomLevel = document.getElementById('zoomLevel');
+            const thumbnailsContainer = document.getElementById('thumbnailsContainer');
+            const totalDocs = document.getElementById('totalDocs');
+            const assignedStats = document.getElementById('assignedStats');
+            const dropzoneGallery = document.getElementById('dropzoneGallery');
+            const fileInput = document.getElementById('fileInput');
+            const nitInput = document.getElementById('nitInput');
+            const facturaInput = document.getElementById('facturaInput');
+            const generarBtn = document.getElementById('generarBtn');
+            const limpiarBtn = document.getElementById('limpiarBtn');
+            const bulkTypeSelect = document.getElementById('bulkTypeSelect');
+            const applyBulkTypeBtn = document.getElementById('applyBulkTypeBtn');
+            const clearSelectionsBtn = document.getElementById('clearSelectionsBtn');
+            const toastEl = document.getElementById('toast');
+
+            function showToast(msg) {
+                toastEl.textContent = msg;
+                toastEl.classList.add('show');
+                clearTimeout(toastEl._timer);
+                toastEl._timer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+            }
+
+            // Renderizar botones de tipos con colores y contadores
+            function renderTypeButtons() {
+                const counts = {};
+                TIPOS.forEach(t => counts[t] = 0);
+                pages.forEach(p => {
+                    if (p.tipo && counts[p.tipo] !== undefined) counts[p.tipo]++;
+                });
+                let html = '';
+                TIPOS.forEach(t => {
+                    const count = counts[t] || 0;
+                    const color = TYPE_COLORS[t] || '#888';
+                    html += `<div class="type-btn"><span class="color-indicator" style="background-color:${color};"></span>${t} <span class="count">${count}</span></div>`;
+                });
+                typeButtonsDiv.innerHTML = html;
+            }
+
+            // Renderizar miniaturas con badge coloreado según tipo
+            async function renderThumbnails() {
+                thumbnailsContainer.innerHTML = '';
+                if (pages.length === 0) {
+                    thumbnailsContainer.innerHTML = '<div style="color:#8b9eb5; padding:0.3rem; width:100%; text-align:center; font-size:0.8rem;">No hay páginas cargadas.</div>';
+                    return;
+                }
+                for (const page of pages) {
+                    const thumbDiv = document.createElement('div');
+                    thumbDiv.className = 'thumb-item' + (page.id === selectedPageId ? ' selected' : '');
+                    if (page.tipo) thumbDiv.classList.add('tipo-asignado');
+                    thumbDiv.dataset.pageId = page.id;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'thumb-canvas';
+                    thumbDiv.appendChild(canvas);
+
+                    const label = document.createElement('div');
+                    label.className = 'thumb-label';
+                    const shortName = page.name.length > 10 ? page.name.substr(0, 8) + '…' : page.name;
+                    label.textContent = `${shortName} (p.${page.pageNum})`;
+                    thumbDiv.appendChild(label);
+
+                    // Badge con color del tipo
+                    if (page.tipo) {
+                        const badge = document.createElement('span');
+                        badge.className = 'thumb-badge';
+                        badge.textContent = page.tipo;
+                        badge.style.backgroundColor = TYPE_COLORS[page.tipo] || '#0b3b5c';
+                        thumbDiv.appendChild(badge);
+                    }
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'thumb-remove';
+                    removeBtn.textContent = '✕';
+                    removeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(thumbDiv.dataset.pageId, 10);
+                        removePage(id);
+                    });
+                    thumbDiv.appendChild(removeBtn);
+
+                    const check = document.createElement('input');
+                    check.type = 'checkbox';
+                    check.className = 'thumb-check';
+                    check.dataset.pageId = page.id;
+                    thumbDiv.appendChild(check);
+
+                    thumbDiv.addEventListener('click', (e) => {
+                        if (e.target.tagName === 'INPUT') return;
+                        const id = parseInt(thumbDiv.dataset.pageId, 10);
+                        selectPage(id);
+                    });
+
+                    thumbnailsContainer.appendChild(thumbDiv);
+
+                    try {
+                        if (page.pageObj) {
+                            const viewport = page.pageObj.getViewport({scale: 0.2});
+                            canvas.width = viewport.width;
+                            canvas.height = viewport.height;
+                            await page.pageObj.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+                        }
+                    } catch (err) {
+                        console.warn('Error en miniatura para', page.name, err);
+                    }
+                }
+                updateStats();
+            }
+
+            // Seleccionar página y mostrar en visor
+            async function selectPage(id) {
+                selectedPageId = id;
+                const page = pages.find(p => p.id === id);
+                if (!page) return;
+
+                document.querySelectorAll('.thumb-item').forEach(el => {
+                    el.classList.toggle('selected', parseInt(el.dataset.pageId, 10) === id);
+                });
+
+                if (page.pageObj) {
+                    noPdfMsg.style.display = 'none';
+                    viewerControls.style.display = 'flex';
+                    viewerDocName.textContent = `${page.name} (pág. ${page.pageNum} de ${page.totalPages})`;
+                    totalPagesNum.textContent = page.totalPages;
+                    currentPageId = id;
+                    await renderViewerPage(page);
+                } else {
+                    noPdfMsg.style.display = 'block';
+                    viewerControls.style.display = 'none';
+                    viewerCanvas.style.display = 'none';
+                }
+            }
+
+            // Renderizar página en el visor con zoom
+            async function renderViewerPage(page) {
+                if (!page || !page.pageObj) return;
+                try {
+                    const viewport = page.pageObj.getViewport({scale: zoomScale});
+                    viewerCanvas.width = viewport.width;
+                    viewerCanvas.height = viewport.height;
+                    viewerCanvas.style.display = 'block';
+                    // Limpiar canvas antes de dibujar
+                    ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
+                    await page.pageObj.render({canvasContext: ctx, viewport}).promise;
+                    currentPageNum.textContent = page.pageNum;
+                    goToPageInput.value = page.pageNum;
+                    zoomLevel.textContent = Math.round(zoomScale * 100) + '%';
+                } catch (err) {
+                    console.warn('Error renderizando página', err);
+                }
+            }
+
+            // Navegación
+            function navigatePages(delta) {
+                if (!currentPageId) return;
+                const currentPage = pages.find(p => p.id === currentPageId);
+                if (!currentPage) return;
+                const docPages = pages.filter(p => p.docId === currentPage.docId).sort((a, b) => a.pageNum - b.pageNum);
+                const idx = docPages.findIndex(p => p.id === currentPageId);
+                let newIdx = idx + delta;
+                if (newIdx < 0) newIdx = 0;
+                if (newIdx >= docPages.length) newIdx = docPages.length - 1;
+                if (newIdx !== idx) {
+                    selectPage(docPages[newIdx].id);
+                }
+            }
+
+            function goToPageNum() {
+                if (!currentPageId) return;
+                const currentPage = pages.find(p => p.id === currentPageId);
+                if (!currentPage) return;
+                let val = parseInt(goToPageInput.value, 10);
+                if (isNaN(val) || val < 1) val = 1;
+                const docPages = pages.filter(p => p.docId === currentPage.docId);
+                if (val > docPages.length) val = docPages.length;
+                const target = docPages.find(p => p.pageNum === val);
+                if (target) selectPage(target.id);
+            }
+
+            function changeZoom(delta) {
+                zoomScale = Math.min(3.0, Math.max(0.3, zoomScale + delta));
+                zoomLevel.textContent = Math.round(zoomScale * 100) + '%';
+                if (currentPageId) {
+                    const page = pages.find(p => p.id === currentPageId);
+                    if (page) renderViewerPage(page);
+                }
+            }
+
+            // Eliminar documento
+            function removePage(id) {
+                const page = pages.find(p => p.id === id);
+                if (!page) return;
+                const docId = page.docId;
+                pages = pages.filter(p => p.docId !== docId);
+                if (currentPageId && pages.some(p => p.id === currentPageId) === false) {
+                    currentPageId = null;
+                    selectedPageId = null;
+                    noPdfMsg.style.display = 'block';
+                    viewerControls.style.display = 'none';
+                    viewerCanvas.style.display = 'none';
+                }
+                renderAll();
+                showToast('Documento eliminado');
+            }
+
+            function updateStats() {
+                totalDocs.textContent = `${pages.length} páginas`;
+                const assigned = pages.filter(p => p.tipo).length;
+                assignedStats.textContent = `${assigned} asignadas`;
+            }
+
+            // Acciones en bloque
+            function applyBulkType() {
+                const tipo = bulkTypeSelect.value;
+                if (!tipo) {
+                    showToast('Selecciona un tipo.');
+                    return;
+                }
+                const checkboxes = document.querySelectorAll('.thumb-check:checked');
+                if (checkboxes.length === 0) {
+                    showToast('Selecciona al menos una página.');
+                    return;
+                }
+                let count = 0;
+                checkboxes.forEach(cb => {
+                    const id = parseInt(cb.dataset.pageId, 10);
+                    const page = pages.find(p => p.id === id);
+                    if (page) {
+                        page.tipo = tipo;
+                        count++;
+                    }
+                });
+                // Desmarcar todos los checkboxes
+                document.querySelectorAll('.thumb-check').forEach(cb => cb.checked = false);
+                renderAll();
+                showToast(`Tipo ${tipo} asignado a ${count} página(s).`);
+            }
+
+            function clearSelections() {
+                document.querySelectorAll('.thumb-check').forEach(cb => cb.checked = false);
+                showToast('Selecciones limpiadas.');
+            }
+
+            function renderAll() {
+                renderTypeButtons();
+                renderThumbnails();
+                if (selectedPageId && pages.some(p => p.id === selectedPageId)) {
+                    const page = pages.find(p => p.id === selectedPageId);
+                    if (page) {
+                        if (currentPageId !== selectedPageId) {
+                            selectPage(selectedPageId);
+                        } else {
+                            renderViewerPage(page);
+                        }
+                    }
+                } else if (pages.length > 0) {
+                    selectPage(pages[0].id);
+                } else {
+                    selectedPageId = null;
+                    currentPageId = null;
+                    noPdfMsg.style.display = 'block';
+                    viewerControls.style.display = 'none';
+                    viewerCanvas.style.display = 'none';
+                }
+                updateStats();
+            }
+
+            // Cargar archivos PDF (corregido para múltiples)
+            async function loadFiles(files) {
+                let loaded = 0;
+                const fileArray = Array.from(files);
+                for (const file of fileArray) {
+                    if (file.type !== 'application/pdf') {
+                        showToast(`"${file.name}" no es PDF, se omite.`);
+                        continue;
+                    }
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                        const numPages = pdf.numPages;
+                        const docId = nextId++;
+                        for (let i = 1; i <= numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            pages.push({
+                                id: nextId++,
+                                docId: docId,
+                                file: file,
+                                name: file.name,
+                                pageNum: i,
+                                totalPages: numPages,
+                                tipo: null,
+                                arrayBuffer: arrayBuffer,
+                                pdfDoc: pdf,
+                                pageObj: page,
+                            });
+                        }
+                        loaded++;
+                    } catch (err) {
+                        showToast(`Error al cargar "${file.name}"`);
+                        console.error(err);
+                    }
+                }
+                if (loaded > 0) {
+                    renderAll();
+                    if (pages.length > 0) selectPage(pages[0].id);
+                    showToast(`${loaded} documento(s) cargado(s) (${pages.length} páginas).`);
+                } else if (fileArray.length > 0) {
+                    showToast('No se pudo cargar ningún PDF.');
+                }
+            }
+
+            // Generar ZIP
+            async function generarZip() {
+                if (pages.length === 0) {
+                    showToast('No hay páginas para procesar.');
+                    return;
+                }
+                const nit = nitInput.value.trim() || 'NIT';
+                const factura = facturaInput.value.trim() || 'FACT';
+                if (!nit || !factura) {
+                    showToast('Ingresa NIT y número de factura.');
+                    return;
+                }
+
+                const groups = {};
+                let unassigned = 0;
+                pages.forEach(p => {
+                    if (!p.tipo) {unassigned++; return;}
+                    if (!groups[p.tipo]) groups[p.tipo] = [];
+                    groups[p.tipo].push(p);
+                });
+
+                if (Object.keys(groups).length === 0) {
+                    showToast('Ninguna página tiene tipo asignado.');
+                    return;
+                }
+                if (unassigned > 0) {
+                    if (!confirm(`Hay ${unassigned} página(s) sin asignar. ¿Continuar?`)) return;
+                }
+
+                showToast('Generando ZIP...');
+                try {
+                    const zip = new JSZip();
+                    for (const [tipo, pagesList] of Object.entries(groups)) {
+                        pagesList.sort((a, b) => a.docId - b.docId || a.pageNum - b.pageNum);
+                        const mergedPdf = await PDFLib.PDFDocument.create();
+                        const docCache = {};
+                        for (const p of pagesList) {
+                            if (!docCache[p.docId]) {
+                                const src = await PDFLib.PDFDocument.load(p.arrayBuffer);
+                                docCache[p.docId] = src;
+                            }
+                            const srcDoc = docCache[p.docId];
+                            const [copiedPage] = await mergedPdf.copyPages(srcDoc, [p.pageNum - 1]);
+                            mergedPdf.addPage(copiedPage);
+                        }
+                        const bytes = await mergedPdf.save();
+                        zip.file(`${tipo}_${nit}_${factura}.pdf`, bytes);
+                    }
+                    const zipBlob = await zip.generateAsync({type: 'blob'});
+                    saveAs(zipBlob, `Tipificacion_${nit}_${factura}.zip`);
+                    showToast(`✅ ZIP generado con ${Object.keys(groups).length} archivo(s).`);
+                } catch (err) {
+                    console.error(err);
+                    showToast('Error al generar el ZIP.');
+                }
+            }
+
+            function limpiarTodo() {
+                if (pages.length === 0) return;
+                if (!confirm('¿Eliminar todos los documentos cargados?')) return;
+                pages = [];
+                selectedPageId = null;
+                currentPageId = null;
+                renderAll();
+                showToast('Todo limpiado.');
+            }
+
+            // Eventos
+            function init() {
+                dropzoneGallery.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropzoneGallery.style.borderColor = '#0b3b5c';
+                });
+                dropzoneGallery.addEventListener('dragleave', () => {
+                    dropzoneGallery.style.borderColor = '#cbd7e6';
+                });
+                dropzoneGallery.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropzoneGallery.style.borderColor = '#cbd7e6';
+                    if (e.dataTransfer.files.length) loadFiles(e.dataTransfer.files);
+                });
+                dropzoneGallery.addEventListener('click', () => fileInput.click());
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files.length) {
+                        loadFiles(fileInput.files);
+                    }
+                    fileInput.value = '';
+                });
+
+                prevPageBtn.addEventListener('click', () => navigatePages(-1));
+                nextPageBtn.addEventListener('click', () => navigatePages(1));
+                goToPageBtn.addEventListener('click', goToPageNum);
+                goToPageInput.addEventListener('keydown', (e) => {if (e.key === 'Enter') goToPageNum();});
+                zoomInBtn.addEventListener('click', () => changeZoom(0.1));
+                zoomOutBtn.addEventListener('click', () => changeZoom(-0.1));
+
+                applyBulkTypeBtn.addEventListener('click', applyBulkType);
+                clearSelectionsBtn.addEventListener('click', clearSelections);
+
+                generarBtn.addEventListener('click', generarZip);
+                limpiarBtn.addEventListener('click', limpiarTodo);
+
+                renderAll();
+            }
+
+            init();
+        })();
+    </script>
+</body>
+
+</html>
