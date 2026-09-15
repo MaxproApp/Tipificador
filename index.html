@@ -2803,18 +2803,22 @@
 
               for (const p of pagesList) {
                 if (!docCache[p.docId]) {
-                  const src = await PDFLib.PDFDocument.load(p.arrayBuffer);
-                  docCache[p.docId] = src;
+                  try {
+                    const src = await PDFLib.PDFDocument.load(p.arrayBuffer, {
+                      ignoreEncryption: true,
+                    });
+                    docCache[p.docId] = src;
+                  } catch (err) {
+                    console.error(`No se pudo cargar ${p.name}:`, err);
+                    showToast(`⚠️ No se pudo procesar "${p.name}"`);
+                    continue;
+                  }
                 }
                 const srcDoc = docCache[p.docId];
-                const [copiedPage] = await mergedPdf.copyPages(srcDoc, [p.realPageIndex]);
+                const [copiedPage] = await mergedPdf.copyPages(srcDoc, [
+                  p.realPageIndex ?? p.pageNum - 1,
+                ]);
                 mergedPdf.addPage(copiedPage);
-
-                paginasProcesadas++;
-                zipLoaderUpdate(
-                  (paginasProcesadas / totalPaginas) * 100,
-                  `Procesando ${tipo} (${paginasProcesadas}/${totalPaginas})`,
-                );
               }
 
               const bytes = await mergedPdf.save();
