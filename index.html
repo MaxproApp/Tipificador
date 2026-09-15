@@ -2311,10 +2311,11 @@
                     const removeBtn = document.createElement("button");
                     removeBtn.className = "thumb-remove";
                     removeBtn.textContent = "✕";
-                    removeBtn.addEventListener("click", (e) => {
+                    removeBtn.addEventListener("click", async (e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         const id = parseInt(thumbDiv.dataset.pageId, 10);
-                        removePage(id);
+                        await removePage(id);
                     });
                     thumbDiv.appendChild(removeBtn);
 
@@ -2428,23 +2429,24 @@
             }
 
             // Eliminar una página específica (no todo el documento)
-            function removePage(id) {
+            // Eliminar una página específica (no todo el documento)
+            async function removePage(id) {
                 const pageIndex = pages.findIndex((p) => p.id === id);
                 if (pageIndex === -1) return;
 
                 const page = pages[pageIndex];
                 const docId = page.docId;
 
-                // Preguntar confirmación solo si es la única página del documento
+                // Si es la única página del documento, confirmar con modal elegante
                 const paginasDelDoc = pages.filter((p) => p.docId === docId);
                 if (paginasDelDoc.length === 1) {
-                    if (
-                        !confirm(
-                            `Esta es la única página de "${page.name}". ¿Eliminar el documento completo?`,
-                        )
-                    ) {
-                        return;
-                    }
+                    const ok = await pedirConfirmacion({
+                        titulo: "¿Eliminar documento?",
+                        mensaje: `"${page.name}" solo tiene esta página. Si la eliminas, se quitará el documento completo del proceso.`,
+                        textoOk: "Sí, eliminar",
+                        icono: "🗑️",
+                    });
+                    if (!ok) return;
                 }
 
                 // Eliminar SOLO esa página
@@ -2459,8 +2461,7 @@
                     p.totalPages = restantes.length;
                 });
 
-                // Si ya no hay páginas de este doc, no hay nada más que hacer (ya se eliminó la última)
-                // Si la página eliminada era la seleccionada o la actual, seleccionar otra
+                // Si la página eliminada era la seleccionada o la actual, limpiar
                 if (selectedPageId === id) {
                     selectedPageId = null;
                     currentPageId = null;
@@ -2469,9 +2470,8 @@
                     currentPageId = null;
                 }
 
-                // Si quedan páginas, seleccionar la primera disponible
+                // Si quedan páginas, seleccionar la siguiente del mismo doc o la primera
                 if (pages.length > 0) {
-                    // Intentar seleccionar la siguiente página del mismo doc, o la primera general
                     const siguiente = restantes.length > 0 ? restantes[0] : pages[0];
                     selectedPageId = siguiente.id;
                 } else {
@@ -2481,7 +2481,7 @@
                 }
 
                 renderAll();
-                showToast(`Página ${page.pageNum} eliminada.`);
+                showToast(`🗑️ Página ${page.pageNum} eliminada.`);
             }
 
             function updateStats() {
