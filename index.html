@@ -1748,7 +1748,9 @@
           </div>
         </div>
         <div class="header-right">
-          <div class="header-badge">Soporte Tecnico</div>
+          <div class="header-badge" id="liveClock">
+            📅 --/--/---- · 🕐 --:--:--
+          </div>
           <!-- LOGIN: chip del usuario + logout -->
           <span class="user-chip" id="userChip">👤</span>
           <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
@@ -1770,7 +1772,12 @@
               maxlength="15"
             />
             <label>N° Factura</label>
-            <input type="text" id="facturaInput" placeholder="CRE0010" maxlength="10"/>
+            <input
+              type="text"
+              id="facturaInput"
+              placeholder="CRE0010"
+              maxlength="10"
+            />
             <button class="btn-generate" id="generarBtn">📦 Generar ZIP</button>
             <button class="btn-clear" id="limpiarBtn">🗑️ Limpiar todo</button>
           </div>
@@ -2923,6 +2930,15 @@
             facturaInput.value = facturaInput.value.toUpperCase();
             facturaInput.setSelectionRange(pos, pos);
           });
+          function updateClock() {
+            const now = new Date();
+            const fecha = now.toLocaleDateString("es-CO");
+            const hora = now.toLocaleTimeString("es-CO");
+            const el = document.getElementById("liveClock");
+            if (el) el.textContent = `📅 ${fecha} · 🕐 ${hora}`;
+          }
+          updateClock();
+          setInterval(updateClock, 1000);
           renderAll();
         }
 
