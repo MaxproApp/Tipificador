@@ -246,6 +246,109 @@
             }
         }
 
+        /* ========= MODAL DE CONFIRMACIÓN ========= */
+        .modal-confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 42, 64, 0.45);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .modal-confirm-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-confirm {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 24px 60px rgba(0, 20, 40, 0.25);
+            padding: 1.6rem 1.5rem 1.3rem;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            transform: translateY(12px) scale(0.97);
+            transition: transform 0.22s cubic-bezier(.2, .9, .3, 1.2);
+        }
+
+        .modal-confirm-overlay.show .modal-confirm {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-confirm .modal-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #fdeaea;
+            color: #c0392b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 0.9rem;
+        }
+
+        .modal-confirm h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #0b2a40;
+            margin-bottom: 0.4rem;
+        }
+
+        .modal-confirm p {
+            font-size: 0.85rem;
+            color: #5b6f88;
+            line-height: 1.45;
+            margin-bottom: 1.3rem;
+        }
+
+        .modal-confirm .modal-actions {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .modal-confirm .modal-actions button {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: background 0.15s, transform 0.08s;
+        }
+
+        .modal-confirm .modal-actions button:active {
+            transform: scale(0.97);
+        }
+
+        .modal-confirm .btn-cancel {
+            background: #eef3f9;
+            color: #1f3a57;
+        }
+
+        .modal-confirm .btn-cancel:hover {
+            background: #e2eaf3;
+        }
+
+        .modal-confirm .btn-confirm {
+            background: #c0392b;
+            color: white;
+        }
+
+        .modal-confirm .btn-confirm:hover {
+            background: #a83224;
+        }
+
         .types-panel {
             background: #fafcff;
             border: 1px solid #e5ebf3;
@@ -797,7 +900,18 @@
     </div>
 
     <div id="toast" class="toast"></div>
-
+    <!-- ========= MODAL DE CONFIRMACIÓN ========= -->
+    <div id="confirmModal" class="modal-confirm-overlay">
+        <div class="modal-confirm">
+            <div class="modal-icon">🚪</div>
+            <h3 id="confirmTitle">¿Cerrar sesión?</h3>
+            <p id="confirmMessage">Tu sesión se cerrará y volverás a la pantalla de inicio.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="confirmCancel">Cancelar</button>
+                <button type="button" class="btn-confirm" id="confirmOk">Sí, cerrar sesión</button>
+            </div>
+        </div>
+    </div>
     <script>
         /* ================================================================
            LOGIN · Gestión de autenticación con archivo plano usuarios.json
@@ -929,8 +1043,53 @@
                 }, 250);
             });
 
-            logoutBtn.addEventListener('click', () => {
-                if (!confirm('¿Cerrar sesión?')) return;
+            // ----- Helper reutilizable para pedir confirmación -----
+            function pedirConfirmacion({titulo, mensaje, textoOk = 'Confirmar', icono = '⚠️'}) {
+                return new Promise((resolve) => {
+                    const overlay = document.getElementById('confirmModal');
+                    const titleEl = document.getElementById('confirmTitle');
+                    const msgEl = document.getElementById('confirmMessage');
+                    const okBtn = document.getElementById('confirmOk');
+                    const cancelBtn = document.getElementById('confirmCancel');
+                    const iconEl = overlay.querySelector('.modal-icon');
+
+                    titleEl.textContent = titulo;
+                    msgEl.textContent = mensaje;
+                    okBtn.textContent = textoOk;
+                    iconEl.textContent = icono;
+
+                    // limpia listeners previos clonando
+                    const nuevoOk = okBtn.cloneNode(true);
+                    const nuevoCancel = cancelBtn.cloneNode(true);
+                    okBtn.replaceWith(nuevoOk);
+                    cancelBtn.replaceWith(nuevoCancel);
+
+                    function cerrar(resultado) {
+                        overlay.classList.remove('show');
+                        setTimeout(() => resolve(resultado), 200);
+                    }
+
+                    nuevoOk.addEventListener('click', () => cerrar(true));
+                    nuevoCancel.addEventListener('click', () => cerrar(false));
+                    overlay.addEventListener('click', (e) => {
+                        if (e.target === overlay) cerrar(false);
+                    });
+
+                    overlay.classList.add('show');
+                    setTimeout(() => nuevoOk.focus(), 250);
+                });
+            }
+
+            // ----- Logout con modal elegante -----
+            logoutBtn.addEventListener('click', async () => {
+                const ok = await pedirConfirmacion({
+                    titulo: '¿Cerrar sesión?',
+                    mensaje: 'Tu sesión se cerrará y volverás a la pantalla de inicio.',
+                    textoOk: 'Sí, cerrar sesión',
+                    icono: '🚪'
+                });
+                if (!ok) return;
+
                 AUTH.cerrarSesion();
                 userInput.value = '';
                 mostrarLogin();
@@ -1293,16 +1452,24 @@
                 }
             }
 
-            function limpiarTodo() {
+          
+            async function limpiarTodo() {
                 if (pages.length === 0) return;
-                if (!confirm('¿Eliminar todos los documentos cargados?')) return;
+
+                const ok = await pedirConfirmacion({
+                    titulo: '¿Eliminar todo?',
+                    mensaje: 'Se eliminarán todos los PDFs cargados y sus asignaciones.',
+                    textoOk: 'Sí, eliminar todo',
+                    icono: '🗑️'
+                });
+                if (!ok) return;
+
                 pages = [];
                 selectedPageId = null;
                 currentPageId = null;
                 renderAll();
                 showToast('Todo limpiado.');
             }
-
             function init() {
                 dropzoneGallery.addEventListener('dragover', (e) => {
                     e.preventDefault();
