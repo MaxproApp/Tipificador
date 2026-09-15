@@ -33,107 +33,408 @@
         .login-overlay {
             position: fixed;
             inset: 0;
-            background: linear-gradient(135deg, #eaf2fb 0%, #f4f7fc 100%);
+            background: linear-gradient(-45deg, #eaf2fb, #d6e5f5, #e8f5ee, #f4f7fc);
+            background-size: 400% 400%;
+            animation: login-bg-shift 18s ease infinite;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             padding: 1rem;
+            overflow: hidden;
         }
 
         .login-overlay.hidden {
             display: none;
         }
 
+        @keyframes login-bg-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ---- Orbes flotantes decorativos ---- */
+        .login-overlay::before,
+        .login-overlay::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .login-overlay::before {
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, #7f9fc7, transparent 70%);
+            top: -100px;
+            left: -100px;
+            animation: orb-float 14s ease-in-out infinite;
+        }
+
+        .login-overlay::after {
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, #2a9d6e, transparent 70%);
+            bottom: -120px;
+            right: -120px;
+            animation: orb-float 18s ease-in-out infinite reverse;
+        }
+
+        @keyframes orb-float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(40px, 30px) scale(1.15);
+            }
+        }
+
+        /* ---- Tarjeta ---- */
         .login-card {
-            background: #ffffff;
+            position: relative;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.12);
-            padding: 2.2rem 2rem;
+            box-shadow:
+                0 30px 80px rgba(11, 42, 64, 0.18),
+                0 1px 0 rgba(255, 255, 255, 0.9) inset,
+                0 0 0 1px rgba(11, 59, 92, 0.05);
+            padding: 2.4rem 2rem 1.8rem;
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             text-align: center;
+            z-index: 1;
+            animation: card-enter 0.7s cubic-bezier(.2, .9, .3, 1.2) both;
         }
 
+        @keyframes card-enter {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Línea de luz superior */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(11, 59, 92, 0.35), transparent);
+            border-radius: 1px;
+        }
+
+        /* ---- Logo ---- */
         .login-card .login-logo {
-            width: 180px;
-            max-width: 80%;
+            width: 150px;
+            max-width: 70%;
             height: auto;
-            margin: 0 auto 1rem;
+            margin: 0 auto 1.2rem;
             display: block;
+            animation:
+                logo-enter 0.9s cubic-bezier(.2, .9, .3, 1.3) 0.15s both,
+                logo-float 4s ease-in-out 1s infinite;
+            filter: drop-shadow(0 8px 20px rgba(11, 59, 92, 0.15));
         }
 
+        @keyframes logo-enter {
+            from {
+                opacity: 0;
+                transform: scale(0.5) rotate(-8deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        @keyframes logo-float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        /* ---- Título ---- */
         .login-card h2 {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: #0b2a40;
-            margin-bottom: 1.3rem;
-            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            animation: fade-up 0.5s ease 0.35s both;
         }
 
-        .login-card label {
-            display: block;
-            text-align: left;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #3a5778;
-            margin-bottom: 0.25rem;
-            margin-top: 0.7rem;
+        @keyframes fade-up {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .login-card input {
+        /* ---- Floating labels ---- */
+        .login-field {
+            position: relative;
+            margin-top: 1.2rem;
+            animation: fade-up 0.5s ease both;
+        }
+
+        .login-field:nth-of-type(1) {
+            animation-delay: 0.45s;
+        }
+
+        .login-field:nth-of-type(2) {
+            animation-delay: 0.55s;
+        }
+
+        .login-card .login-field input {
             width: 100%;
-            padding: 0.65rem 0.9rem;
-            border: 1px solid #d0dbe9;
-            border-radius: 10px;
+            padding: 0.95rem 1rem 0.5rem;
+            border: 1.5px solid #d0dbe9;
+            border-radius: 12px;
             font-size: 0.9rem;
             font-family: inherit;
-            transition: border 0.15s, box-shadow 0.15s;
+            background: rgba(255, 255, 255, 0.9);
+            color: #0b2a40;
+            transition: all 0.2s ease;
         }
 
-        .login-card input:focus {
+        .login-card .login-field input:hover {
+            border-color: #a8bdd6;
+        }
+
+        .login-card .login-field input:focus {
             outline: none;
             border-color: #0b3b5c;
-            box-shadow: 0 0 0 3px rgba(11, 59, 92, 0.12);
+            background: #ffffff;
+            box-shadow:
+                0 0 0 4px rgba(11, 59, 92, 0.1),
+                0 4px 12px rgba(11, 59, 92, 0.08);
+            transform: translateY(-1px);
         }
 
-        .login-card button {
+        /* La etiqueta flota arriba cuando el input tiene contenido o foco */
+        .login-card .login-field label {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #7a8fa6;
+            pointer-events: none;
+            transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+            background: transparent;
+            padding: 0 0.3rem;
+            text-align: left;
+            margin: 0;
+            display: block;
+        }
+
+        .login-card .login-field input:focus+label,
+        .login-card .login-field input:not(:placeholder-shown)+label,
+        .login-card .login-field input.filled+label {
+            top: 0;
+            font-size: 0.68rem;
+            color: #0b3b5c;
+            font-weight: 700;
+            background: #ffffff;
+            transform: translateY(-50%) scale(1);
+        }
+
+        /* Ícono dentro del input */
+        .login-card .login-field .field-icon {
+            position: absolute;
+            right: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .login-card .login-field input:focus~.field-icon {
+            opacity: 0.85;
+        }
+
+        /* ---- Botón ---- */
+        .login-card .login-submit {
             width: 100%;
-            margin-top: 1.3rem;
-            padding: 0.7rem;
-            background: #0b3b5c;
+            margin-top: 1.6rem;
+            padding: 0.85rem;
+            background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 50%, #0b3b5c 100%);
+            background-size: 200% 100%;
             color: white;
             border: none;
-            border-radius: 30px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: 700;
             font-size: 0.95rem;
+            letter-spacing: 0.03em;
             cursor: pointer;
-            transition: background 0.15s;
+            position: relative;
+            overflow: hidden;
             font-family: inherit;
+            box-shadow:
+                0 8px 24px rgba(11, 59, 92, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: transform 0.15s ease, box-shadow 0.2s ease, background-position 0.6s ease;
+            animation: fade-up 0.5s ease 0.65s both;
         }
 
-        .login-card button:hover {
-            background: #1a5270;
+        .login-card .login-submit:hover {
+            background-position: 100% 0;
+            transform: translateY(-2px);
+            box-shadow:
+                0 12px 32px rgba(11, 59, 92, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
 
-        .login-card button:disabled {
+        .login-card .login-submit:active {
+            transform: translateY(0);
+            box-shadow:
+                0 4px 12px rgba(11, 59, 92, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .login-card .login-submit:disabled {
             background: #94a8bd;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
+        /* Brillo deslizante */
+        .login-card .login-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .login-card .login-submit:hover::before {
+            left: 100%;
+        }
+
+        /* Spinner dentro del botón cuando está cargando */
+        .login-card .login-submit.loading {
+            color: transparent;
+            pointer-events: none;
+        }
+
+        .login-card .login-submit.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2.5px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: btn-spin 0.7s linear infinite;
+        }
+
+        @keyframes btn-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ---- Error ---- */
         .login-error {
             color: #c0392b;
             font-size: 0.8rem;
-            margin-top: 0.8rem;
+            margin-top: 0.9rem;
             min-height: 1rem;
-            font-weight: 500;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-4px);
+            transition: opacity 0.25s, transform 0.25s;
         }
 
+        .login-error.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Shake cuando falla */
+        @keyframes login-shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-8px);
+            }
+
+            40% {
+                transform: translateX(7px);
+            }
+
+            60% {
+                transform: translateX(-5px);
+            }
+
+            80% {
+                transform: translateX(3px);
+            }
+        }
+
+        .login-card.shake {
+            animation: login-shake 0.45s cubic-bezier(.36, .07, .19, .97);
+        }
+
+        /* ---- Hint ---- */
         .login-hint {
             font-size: 0.7rem;
             color: #94a8bd;
-            margin-top: 1.2rem;
+            margin-top: 1.4rem;
+            animation: fade-up 0.5s ease 0.75s both;
         }
 
+        /* ========================= */
         /* ========================= */
 
         .app {
@@ -1284,16 +1585,21 @@
             <img src="logo.jpg" alt="PDF Splitter" class="login-logo" onerror="this.style.display='none'">
             <h2>Iniciar sesión</h2>
 
-            <label for="loginUser">Usuario</label>
-            <input type="text" id="loginUser" placeholder="Ingresa tu usuario" autocomplete="username" required />
+            <div class="login-field">
+                <input type="text" id="loginUser" placeholder=" " autocomplete="username" required />
+                <label for="loginUser">Usuario</label>
+                <span class="field-icon">👤</span>
+            </div>
 
-            <label for="loginPass">Contraseña</label>
-            <input type="password" id="loginPass" placeholder="Ingresa tu contraseña" autocomplete="current-password"
-                required />
+            <div class="login-field">
+                <input type="password" id="loginPass" placeholder=" " autocomplete="current-password" required />
+                <label for="loginPass">Contraseña</label>
+                <span class="field-icon">🔒</span>
+            </div>
 
-            <button type="submit" id="loginBtn">Ingresar</button>
+            <button type="submit" id="loginBtn" class="login-submit">Ingresar</button>
             <div class="login-error" id="loginError"></div>
-            <div class="login-hint">Sistema de tipificación.</div>
+            <div class="login-hint">Sistema de tipificación · Resolución 2284</div>
         </form>
     </div>
     <!-- ================================================= -->
@@ -1557,6 +1863,10 @@
                 appCont.style.display = 'none';
                 passInput.value = '';
                 errorEl.textContent = '';
+                errorEl.classList.remove('show');
+                document.querySelector('.login-card').classList.remove('shake');
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('loading');
                 userInput.focus();
             }
 
@@ -1568,22 +1878,26 @@
                 mostrarLogin();
             }
 
-            form.addEventListener('submit', (e) => {
+            fform.addEventListener('submit', (e) => {
                 e.preventDefault();
+                const card = document.querySelector('.login-card');
                 errorEl.textContent = '';
+                errorEl.classList.remove('show');
 
                 const u = userInput.value.trim();
                 const p = passInput.value;
 
                 if (!u || !p) {
                     errorEl.textContent = 'Completa usuario y contraseña.';
+                    errorEl.classList.add('show');
+                    card.classList.add('shake');
+                    setTimeout(() => card.classList.remove('shake'), 500);
                     return;
                 }
 
                 loginBtn.disabled = true;
-                loginBtn.textContent = 'Verificando…';
+                loginBtn.classList.add('loading');
 
-                // pequeña espera para que se vea el estado (opcional)
                 setTimeout(() => {
                     const user = AUTH.validar(u, p, usuarios);
                     if (user) {
@@ -1591,12 +1905,15 @@
                         mostrarApp({usuario: user.usuario, nombre: user.nombre});
                     } else {
                         errorEl.textContent = 'Usuario o contraseña incorrectos.';
+                        errorEl.classList.add('show');
+                        card.classList.add('shake');
+                        setTimeout(() => card.classList.remove('shake'), 500);
                         passInput.value = '';
                         passInput.focus();
                     }
                     loginBtn.disabled = false;
-                    loginBtn.textContent = 'Ingresar';
-                }, 250);
+                    loginBtn.classList.remove('loading');
+                }, 400);
             });
 
             // ----- Helper reutilizable para pedir confirmación -----
@@ -1678,7 +1995,7 @@
                 TIPOS.forEach(t => counts[t] = 0);
                 pages.forEach(p => {if (p.tipo && counts[p.tipo] !== undefined) counts[p.tipo]++;});
                 let html = '';
-                
+
                 TIPOS.forEach(t => {
                     const count = counts[t] || 0;
                     const color = TYPE_COLORS[t] || '#888';
