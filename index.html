@@ -2462,23 +2462,61 @@
           }
         }
 
+        // Eliminar una página específica (no todo el documento)
         function removePage(id) {
-          const page = pages.find((p) => p.id === id);
-          if (!page) return;
+          const pageIndex = pages.findIndex((p) => p.id === id);
+          if (pageIndex === -1) return;
+
+          const page = pages[pageIndex];
           const docId = page.docId;
-          pages = pages.filter((p) => p.docId !== docId);
-          if (
-            currentPageId &&
-            pages.some((p) => p.id === currentPageId) === false
-          ) {
-            currentPageId = null;
+
+          // Preguntar confirmación solo si es la única página del documento
+          const paginasDelDoc = pages.filter((p) => p.docId === docId);
+          if (paginasDelDoc.length === 1) {
+            if (
+              !confirm(
+                `Esta es la única página de "${page.name}". ¿Eliminar el documento completo?`,
+              )
+            ) {
+              return;
+            }
+          }
+
+          // Eliminar SOLO esa página
+          pages.splice(pageIndex, 1);
+
+          // Reajustar el número de página de las páginas restantes del mismo documento
+          const restantes = pages
+            .filter((p) => p.docId === docId)
+            .sort((a, b) => a.pageNum - b.pageNum);
+          restantes.forEach((p, i) => {
+            p.pageNum = i + 1;
+            p.totalPages = restantes.length;
+          });
+
+          // Si ya no hay páginas de este doc, no hay nada más que hacer (ya se eliminó la última)
+          // Si la página eliminada era la seleccionada o la actual, seleccionar otra
+          if (selectedPageId === id) {
             selectedPageId = null;
+            currentPageId = null;
+          }
+          if (currentPageId === id) {
+            currentPageId = null;
+          }
+
+          // Si quedan páginas, seleccionar la primera disponible
+          if (pages.length > 0) {
+            // Intentar seleccionar la siguiente página del mismo doc, o la primera general
+            const siguiente = restantes.length > 0 ? restantes[0] : pages[0];
+            selectedPageId = siguiente.id;
+          } else {
             noPdfMsg.style.display = "block";
             viewerControls.style.display = "none";
             viewerCanvas.style.display = "none";
           }
+
           renderAll();
-          showToast("Documento eliminado");
+          showToast(`Página ${page.pageNum} eliminada.`);
         }
 
         function updateStats() {
@@ -2567,13 +2605,14 @@
                 const page = await pdf.getPage(i);
                 pages.push({
                   id: nextId++,
-                  docId,
-                  file,
+                  docId: docId,
+                  file: file,
                   name: file.name,
-                  pageNum: i,
+                  pageNum: i, // número visible (puede cambiar al borrar)
+                  realPageIndex: i - 1, // índice real en el PDF (NO cambia)
                   totalPages: numPages,
                   tipo: null,
-                  arrayBuffer,
+                  arrayBuffer: arrayBuffer,
                   pdfDoc: pdf,
                   pageObj: page,
                 });
@@ -2768,9 +2807,7 @@
                   docCache[p.docId] = src;
                 }
                 const srcDoc = docCache[p.docId];
-                const [copiedPage] = await mergedPdf.copyPages(srcDoc, [
-                  p.pageNum - 1,
-                ]);
+                const [copiedPage] = await mergedPdf.copyPages(srcDoc, [p.realPageIndex]);
                 mergedPdf.addPage(copiedPage);
 
                 paginasProcesadas++;
