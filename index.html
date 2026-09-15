@@ -1685,6 +1685,9 @@
       .bulk-actions select.reset-flash {
         animation: select-reset 0.6s ease-out;
       }
+      #facturaInput {
+        text-transform: uppercase;
+      }
     </style>
   </head>
 
@@ -1899,7 +1902,6 @@
       </div>
     </div>
     <div id="toast" class="toast"></div>
-    <!-- ========= MODAL DE CONFIRMACIÓN ========= -->
     <!-- ========= MODAL DE CONFIRMACIÓN ========= -->
     <div id="confirmModal" class="modal-confirm-overlay">
       <div class="modal-confirm">
@@ -2916,7 +2918,11 @@
 
           generarBtn.addEventListener("click", generarZip);
           limpiarBtn.addEventListener("click", limpiarTodo);
-
+          facturaInput.addEventListener("input", () => {
+            const pos = facturaInput.selectionStart;
+            facturaInput.value = facturaInput.value.toUpperCase();
+            facturaInput.setSelectionRange(pos, pos);
+          });
           renderAll();
         }
 
