@@ -1429,41 +1429,6 @@
 
             // ----- Helper reutilizable para pedir confirmación -----
             // ================== HELPER GLOBAL ==================
-            function pedirConfirmacion({titulo, mensaje, textoOk = 'Confirmar', icono = '⚠️'}) {
-                return new Promise((resolve) => {
-                    const overlay = document.getElementById('confirmModal');
-                    const titleEl = document.getElementById('confirmTitle');
-                    const msgEl = document.getElementById('confirmMessage');
-                    const okBtn = document.getElementById('confirmOk');
-                    const cancelBtn = document.getElementById('confirmCancel');
-                    const iconEl = overlay.querySelector('.modal-icon');
-
-                    titleEl.textContent = titulo;
-                    msgEl.textContent = mensaje;
-                    okBtn.textContent = textoOk;
-                    iconEl.textContent = icono;
-
-                    // Clonar para limpiar listeners previos
-                    const nuevoOk = okBtn.cloneNode(true);
-                    const nuevoCancel = cancelBtn.cloneNode(true);
-                    okBtn.replaceWith(nuevoOk);
-                    cancelBtn.replaceWith(nuevoCancel);
-
-                    function cerrar(resultado) {
-                        overlay.classList.remove('show');
-                        setTimeout(() => resolve(resultado), 200);
-                    }
-
-                    nuevoOk.addEventListener('click', () => cerrar(true));
-                    nuevoCancel.addEventListener('click', () => cerrar(false));
-                    overlay.addEventListener('click', (e) => {
-                        if (e.target === overlay) cerrar(false);
-                    });
-
-                    overlay.classList.add('show');
-                    setTimeout(() => nuevoOk.focus(), 250);
-                });
-            }
 
             // ----- Logout con modal elegante -----
             logoutBtn.addEventListener('click', async () => {
@@ -1946,6 +1911,41 @@
                     console.error(err);
                     zipLoaderFinish(false, 'Ocurrió un error al generar el ZIP.');
                 }
+            }
+            function pedirConfirmacion({titulo, mensaje, textoOk = 'Confirmar', icono = '⚠️'}) {
+                return new Promise((resolve) => {
+                    const overlay = document.getElementById('confirmModal');
+                    const titleEl = document.getElementById('confirmTitle');
+                    const msgEl = document.getElementById('confirmMessage');
+                    const okBtn = document.getElementById('confirmOk');
+                    const cancelBtn = document.getElementById('confirmCancel');
+                    const iconEl = overlay.querySelector('.modal-icon');
+
+                    titleEl.textContent = titulo;
+                    msgEl.textContent = mensaje;
+                    okBtn.textContent = textoOk;
+                    iconEl.textContent = icono;
+
+                    // Clonar para limpiar listeners previos
+                    const nuevoOk = okBtn.cloneNode(true);
+                    const nuevoCancel = cancelBtn.cloneNode(true);
+                    okBtn.replaceWith(nuevoOk);
+                    cancelBtn.replaceWith(nuevoCancel);
+
+                    function cerrar(resultado) {
+                        overlay.classList.remove('show');
+                        setTimeout(() => resolve(resultado), 200);
+                    }
+
+                    nuevoOk.addEventListener('click', () => cerrar(true));
+                    nuevoCancel.addEventListener('click', () => cerrar(false));
+                    overlay.addEventListener('click', (e) => {
+                        if (e.target === overlay) cerrar(false);
+                    });
+
+                    overlay.classList.add('show');
+                    setTimeout(() => nuevoOk.focus(), 250);
+                });
             }
 
 
