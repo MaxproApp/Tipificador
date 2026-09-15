@@ -1274,12 +1274,71 @@
 
         .thumb-item .thumb-check {
             position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 16px;
-            height: 16px;
-            accent-color: #0b3b5c;
+            bottom: 6px;
+            right: 6px;
+            width: 22px;
+            height: 22px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: #ffffff;
+            border: 2px solid #cbd7e6;
+            border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+            box-shadow: 0 2px 6px rgba(11, 59, 92, 0.15);
+        }
+
+        /* Palomita interna (con SVG embebido) */
+        .thumb-item .thumb-check::after {
+            content: '';
+            width: 11px;
+            height: 11px;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0;
+            transform: scale(0.3);
+            transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .thumb-item .thumb-check:hover {
+            border-color: #7f9fc7;
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(11, 59, 92, 0.25);
+        }
+
+        .thumb-item .thumb-check:checked {
+            background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
+            border-color: #0b3b5c;
+            box-shadow: 0 3px 12px rgba(11, 59, 92, 0.45);
+        }
+
+        .thumb-item .thumb-check:checked::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Pulso al marcar */
+        @keyframes check-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(11, 59, 92, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(11, 59, 92, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(11, 59, 92, 0);
+            }
+        }
+
+        .thumb-item .thumb-check:checked {
+            animation: check-pulse 0.5s ease-out;
         }
 
         .gallery-footer {
