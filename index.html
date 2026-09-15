@@ -163,16 +163,22 @@
         }
 
         .logo {
-            width: 40px;
-            height: 40px;
-            background: #0b3b5c;
+            width: 44px;
+            height: 44px;
+            background: #ffffff;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 18px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 20, 40, 0.08);
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 2px;
         }
 
         .header-title h1 {
@@ -777,6 +783,211 @@
             background: #cbd7e6;
             border-radius: 10px;
         }
+
+        /* ========= OVERLAY DE CARGA ZIP ========= */
+        .zip-loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 42, 64, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .zip-loader-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .zip-loader-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 30px 80px rgba(0, 20, 40, 0.35);
+            padding: 2rem 2.2rem 1.8rem;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.35s cubic-bezier(.2, .9, .3, 1.3);
+        }
+
+        .zip-loader-overlay.show .zip-loader-card {
+            transform: translateY(0) scale(1);
+        }
+
+        /* --- Spinner circular animado --- */
+        .zip-spinner {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.2rem;
+        }
+
+        .zip-spinner svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .zip-spinner-track {
+            fill: none;
+            stroke: #e6eef7;
+            stroke-width: 4;
+        }
+
+        .zip-spinner-head {
+            fill: none;
+            stroke: #0b3b5c;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 126;
+            stroke-dashoffset: 90;
+            animation: zip-dash 1.5s ease-in-out infinite;
+        }
+
+        @keyframes zip-dash {
+            0% {
+                stroke-dashoffset: 90;
+                transform: rotate(0deg);
+            }
+
+            50% {
+                stroke-dashoffset: 30;
+                transform: rotate(180deg);
+            }
+
+            100% {
+                stroke-dashoffset: 90;
+                transform: rotate(360deg);
+            }
+        }
+
+        .zip-spinner-icon {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            animation: zip-bounce 1.2s ease-in-out infinite;
+        }
+
+        @keyframes zip-bounce {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-4px) scale(1.08);
+            }
+        }
+
+        /* --- Textos --- */
+        .zip-loader-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0b2a40;
+            margin-bottom: 0.35rem;
+        }
+
+        .zip-loader-card p {
+            font-size: 0.85rem;
+            color: #5b6f88;
+            margin-bottom: 1.3rem;
+            min-height: 1.2em;
+        }
+
+        /* --- Barra de progreso --- */
+        .zip-progress {
+            width: 100%;
+            height: 8px;
+            background: #eef3f9;
+            border-radius: 30px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .zip-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0b3b5c 0%, #1b6b4a 100%);
+            border-radius: 30px;
+            transition: width 0.4s cubic-bezier(.4, 0, .2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .zip-progress-bar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.35) 50%,
+                    transparent 100%);
+            animation: zip-shimmer 1.4s linear infinite;
+        }
+
+        @keyframes zip-shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .zip-progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: #5b6f88;
+            font-weight: 500;
+        }
+
+        .zip-progress-text #zipProgressPct {
+            color: #0b3b5c;
+            font-weight: 700;
+        }
+
+        /* --- Estado de éxito --- */
+        .zip-loader-card.success .zip-spinner-head {
+            stroke: #1b6b4a;
+            animation: none;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .zip-loader-card.success .zip-spinner-icon {
+            animation: zip-success-pop 0.5s cubic-bezier(.2, .9, .3, 1.6);
+        }
+
+        @keyframes zip-success-pop {
+            0% {
+                transform: scale(0.4);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.25);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -805,7 +1016,9 @@
     <div class="app" id="appContainer" style="display:none;">
         <div class="header">
             <div class="header-left">
-                <div class="logo">📋</div>
+                <div class="logo">
+                    <img src="logo1.png" alt="PDF Splitter" />
+                </div>
                 <div class="header-title">
                     <h1>Tipificación</h1>
                     <p>Separación de soportes de cobro</p>
@@ -827,9 +1040,9 @@
                 <div id="typeButtons"></div>
                 <div class="nit-factura-fields">
                     <label>NIT</label>
-                    <input type="text" id="nitInput" value="819003863" />
+                    <input type="text" id="nitInput" placeholder="819003652" />
                     <label>N° Factura</label>
-                    <input type="text" id="facturaInput" value="PREV11100" />
+                    <input type="text" id="facturaInput" placeholder="CRE0010" />
                     <button class="btn-generate" id="generarBtn">📦 Generar ZIP</button>
                     <button class="btn-clear" id="limpiarBtn">🗑️ Limpiar todo</button>
                 </div>
@@ -898,7 +1111,31 @@
             Herramienta de tipificación.Ministerio de Salud Colombia
         </div>
     </div>
+    <!-- ========= OVERLAY DE CARGA ZIP ========= -->
+    <div id="zipLoader" class="zip-loader-overlay">
+        <div class="zip-loader-card">
+            <!-- Spinner animado -->
+            <div class="zip-spinner">
+                <svg viewBox="0 0 50 50">
+                    <circle class="zip-spinner-track" cx="25" cy="25" r="20"></circle>
+                    <circle class="zip-spinner-head" cx="25" cy="25" r="20"></circle>
+                </svg>
+                <div class="zip-spinner-icon">📦</div>
+            </div>
 
+            <h3 id="zipLoaderTitle">Generando ZIP…</h3>
+            <p id="zipLoaderMessage">Preparando documentos…</p>
+
+            <!-- Barra de progreso -->
+            <div class="zip-progress">
+                <div class="zip-progress-bar" id="zipProgressBar"></div>
+            </div>
+            <div class="zip-progress-text">
+                <span id="zipProgressPct">0%</span>
+                <span id="zipProgressStep">Iniciando…</span>
+            </div>
+        </div>
+    </div>
     <div id="toast" class="toast"></div>
     <!-- ========= MODAL DE CONFIRMACIÓN ========= -->
     <div id="confirmModal" class="modal-confirm-overlay">
@@ -1405,6 +1642,67 @@
                 }
             }
 
+            // ---- Helper para controlar el loader ----
+            function zipLoaderStart() {
+                const overlay = document.getElementById('zipLoader');
+                const card = overlay.querySelector('.zip-loader-card');
+                const title = document.getElementById('zipLoaderTitle');
+                const msg = document.getElementById('zipLoaderMessage');
+                const bar = document.getElementById('zipProgressBar');
+                const pct = document.getElementById('zipProgressPct');
+                const step = document.getElementById('zipProgressStep');
+
+                card.classList.remove('success');
+                title.textContent = 'Generando ZIP…';
+                msg.textContent = 'Preparando documentos…';
+                bar.style.width = '0%';
+                pct.textContent = '0%';
+                step.textContent = 'Iniciando…';
+
+                overlay.classList.add('show');
+            }
+
+            function zipLoaderUpdate(percent, message) {
+                const bar = document.getElementById('zipProgressBar');
+                const pct = document.getElementById('zipProgressPct');
+                const step = document.getElementById('zipProgressStep');
+                const msg = document.getElementById('zipLoaderMessage');
+
+                const p = Math.max(0, Math.min(100, Math.round(percent)));
+                bar.style.width = p + '%';
+                pct.textContent = p + '%';
+                if (message) {step.textContent = message; msg.textContent = message;}
+            }
+
+            function zipLoaderFinish(success, message) {
+                const overlay = document.getElementById('zipLoader');
+                const card = overlay.querySelector('.zip-loader-card');
+                const title = document.getElementById('zipLoaderTitle');
+                const msg = document.getElementById('zipLoaderMessage');
+                const step = document.getElementById('zipProgressStep');
+
+                if (success) {
+                    card.classList.add('success');
+                    document.querySelector('#zipLoader .zip-spinner-icon').textContent = '✅';
+                    title.textContent = '¡Listo!';
+                    msg.textContent = message || 'ZIP generado correctamente';
+                    step.textContent = 'Completado';
+                    zipLoaderUpdate(100, 'Completado');
+                    setTimeout(() => {
+                        overlay.classList.remove('show');
+                        // resetear icono para la próxima vez
+                        setTimeout(() => {
+                            document.querySelector('#zipLoader .zip-spinner-icon').textContent = '📦';
+                        }, 300);
+                    }, 1400);
+                } else {
+                    title.textContent = 'Error';
+                    msg.textContent = message || 'No se pudo generar el ZIP';
+                    setTimeout(() => overlay.classList.remove('show'), 1600);
+                }
+            }
+
+            // ---- Función principal con progreso en tiempo real ----
             async function generarZip() {
                 if (pages.length === 0) {showToast('No hay páginas para procesar.'); return;}
                 const nit = nitInput.value.trim() || 'NIT';
@@ -1419,18 +1717,45 @@
                     groups[p.tipo].push(p);
                 });
 
-                if (Object.keys(groups).length === 0) {showToast('Ninguna página tiene tipo asignado.'); return;}
-                if (unassigned > 0) {
-                    if (!confirm(`Hay ${unassigned} página(s) sin asignar. ¿Continuar?`)) return;
+                if (Object.keys(groups).length === 0) {
+                    showToast('Ninguna página tiene tipo asignado.');
+                    return;
                 }
 
-                showToast('Generando ZIP...');
+                if (unassigned > 0) {
+                    const ok = await pedirConfirmacion({
+                        titulo: 'Hay páginas sin asignar',
+                        mensaje: `Hay ${unassigned} página(s) sin tipo asignado. ¿Deseas continuar de todas formas?`,
+                        textoOk: 'Sí, continuar',
+                        icono: '⚠️'
+                    });
+                    if (!ok) return;
+                }
+
+                // 👇 Arranca la animación
+                zipLoaderStart();
+
                 try {
                     const zip = new JSZip();
-                    for (const [tipo, pagesList] of Object.entries(groups)) {
+
+                    // Calcular total de páginas para el progreso real
+                    const totalPaginas = Object.values(groups).reduce((sum, arr) => sum + arr.length, 0);
+                    let paginasProcesadas = 0;
+
+                    const tipos = Object.keys(groups);
+                    for (let i = 0; i < tipos.length; i++) {
+                        const tipo = tipos[i];
+                        const pagesList = groups[tipo];
                         pagesList.sort((a, b) => a.docId - b.docId || a.pageNum - b.pageNum);
+
+                        zipLoaderUpdate(
+                            (paginasProcesadas / totalPaginas) * 100,
+                            `Procesando ${tipo}…`
+                        );
+
                         const mergedPdf = await PDFLib.PDFDocument.create();
                         const docCache = {};
+
                         for (const p of pagesList) {
                             if (!docCache[p.docId]) {
                                 const src = await PDFLib.PDFDocument.load(p.arrayBuffer);
@@ -1439,20 +1764,43 @@
                             const srcDoc = docCache[p.docId];
                             const [copiedPage] = await mergedPdf.copyPages(srcDoc, [p.pageNum - 1]);
                             mergedPdf.addPage(copiedPage);
+
+                            paginasProcesadas++;
+                            zipLoaderUpdate(
+                                (paginasProcesadas / totalPaginas) * 100,
+                                `Procesando ${tipo} (${paginasProcesadas}/${totalPaginas})`
+                            );
                         }
+
                         const bytes = await mergedPdf.save();
                         zip.file(`${tipo}_${nit}_${factura}.pdf`, bytes);
+
+                        // Dar un respiro al navegador para que repinte la UI
+                        await new Promise(r => setTimeout(r, 30));
                     }
-                    const zipBlob = await zip.generateAsync({type: 'blob'});
+
+                    zipLoaderUpdate(98, 'Comprimiendo archivos…');
+                    const zipBlob = await zip.generateAsync(
+                        {type: 'blob'},
+                        (meta) => {
+                            // meta.percent va de 0 a 100 según JSZip
+                            zipLoaderUpdate(
+                                98 + (meta.percent / 100) * 2,
+                                `Comprimiendo… ${Math.round(meta.percent)}%`
+                            );
+                        }
+                    );
+
                     saveAs(zipBlob, `Tipificacion_${nit}_${factura}.zip`);
-                    showToast(`✅ ZIP generado con ${Object.keys(groups).length} archivo(s).`);
+
+                    zipLoaderFinish(true, `ZIP con ${tipos.length} archivo(s) generado.`);
                 } catch (err) {
                     console.error(err);
-                    showToast('Error al generar el ZIP.');
+                    zipLoaderFinish(false, 'Ocurrió un error al generar el ZIP.');
                 }
             }
 
-          
+
             async function limpiarTodo() {
                 if (pages.length === 0) return;
 
