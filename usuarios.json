@@ -1,0 +1,19 @@
+{
+  "usuarios": [
+    {
+      "usuario": "admin",
+      "password": "admin123",
+      "nombre": "Administrador"
+    },
+    {
+      "usuario": "facturacion",
+      "password": "fact2024",
+      "nombre": "Área de Facturación"
+    },
+    {
+      "usuario": "auditor",
+      "password": "audit2024",
+      "nombre": "Auditoría Interna"
+    }
+  ]
+}

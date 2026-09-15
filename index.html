@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tipificación 2284 - Gestor de PDFs</title>
+    <title>Tipificación - Gestor de PDFs</title>
     <!-- Librerías -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -28,6 +28,113 @@
             justify-content: center;
             align-items: flex-start;
         }
+
+        /* ========= LOGIN ========= */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #eaf2fb 0%, #f4f7fc 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .login-overlay.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.12);
+            padding: 2.2rem 2rem;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .login-card .login-logo {
+            width: 180px;
+            max-width: 80%;
+            height: auto;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+
+        .login-card h2 {
+            font-size: 1.2rem;
+            color: #0b2a40;
+            margin-bottom: 1.3rem;
+            font-weight: 600;
+        }
+
+        .login-card label {
+            display: block;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #3a5778;
+            margin-bottom: 0.25rem;
+            margin-top: 0.7rem;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 0.65rem 0.9rem;
+            border: 1px solid #d0dbe9;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border 0.15s, box-shadow 0.15s;
+        }
+
+        .login-card input:focus {
+            outline: none;
+            border-color: #0b3b5c;
+            box-shadow: 0 0 0 3px rgba(11, 59, 92, 0.12);
+        }
+
+        .login-card button {
+            width: 100%;
+            margin-top: 1.3rem;
+            padding: 0.7rem;
+            background: #0b3b5c;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+
+        .login-card button:hover {
+            background: #1a5270;
+        }
+
+        .login-card button:disabled {
+            background: #94a8bd;
+            cursor: not-allowed;
+        }
+
+        .login-error {
+            color: #c0392b;
+            font-size: 0.8rem;
+            margin-top: 0.8rem;
+            min-height: 1rem;
+            font-weight: 500;
+        }
+
+        .login-hint {
+            font-size: 0.7rem;
+            color: #94a8bd;
+            margin-top: 1.2rem;
+        }
+
+        /* ========================= */
 
         .app {
             max-width: 1500px;
@@ -80,6 +187,13 @@
             margin-top: 2px;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
         .header-badge {
             background: #eef3f9;
             padding: 0.3rem 1rem;
@@ -87,6 +201,32 @@
             font-size: 0.75rem;
             font-weight: 500;
             color: #1f4a6e;
+        }
+
+        .user-chip {
+            background: #e6f5ee;
+            color: #1b6b4a;
+            padding: 0.3rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #e0b8b8;
+            color: #b03a3a;
+            padding: 0.3rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+
+        .logout-btn:hover {
+            background: #fdeaea;
         }
 
         .main-grid {
@@ -539,21 +679,46 @@
 
 <body>
 
-    <div class="app">
+    <!-- ================= LOGIN OVERLAY ================= -->
+    <div id="loginOverlay" class="login-overlay">
+        <form class="login-card" id="loginForm" autocomplete="on">
+            <img src="logo.png" alt="PDF Splitter" class="login-logo" onerror="this.style.display='none'">
+            <h2>Iniciar sesión</h2>
+
+            <label for="loginUser">Usuario</label>
+            <input type="text" id="loginUser" placeholder="Ingresa tu usuario" autocomplete="username" required />
+
+            <label for="loginPass">Contraseña</label>
+            <input type="password" id="loginPass" placeholder="Ingresa tu contraseña" autocomplete="current-password"
+                required />
+
+            <button type="submit" id="loginBtn">Ingresar</button>
+            <div class="login-error" id="loginError"></div>
+            <div class="login-hint">Sistema de tipificación.</div>
+        </form>
+    </div>
+    <!-- ================================================= -->
+
+    <div class="app" id="appContainer" style="display:none;">
         <div class="header">
             <div class="header-left">
                 <div class="logo">📋</div>
                 <div class="header-title">
-                    <h1>Tipificación Soft.</h1>
-                    <p>Separación de soportes de cobro.</p>
+                    <h1>Tipificación</h1>
+                    <p>Separación de soportes de cobro</p>
                 </div>
             </div>
-            <div class="header-badge">Anexo 2 · HEV · EPI · PDX · DQX · RAN · CRC · TAP · TNA · FAT · FMO · OPF · LDP ·
-                HAU · HAO · HAM</div>
+            <div class="header-right">
+                <div class="header-badge">Anexo 2 · HEV · EPI · PDX · DQX · RAN · CRC · TAP · TNA · FAT · FMO · OPF ·
+                    LDP ·
+                    HAU · HAO · HAM</div>
+                <!-- LOGIN: chip del usuario + logout -->
+                <span class="user-chip" id="userChip">👤</span>
+                <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+            </div>
         </div>
 
         <div class="main-grid">
-            <!-- Panel izquierdo: Tipos informativos con colores -->
             <div class="types-panel">
                 <h3>📌 Asignar tipo</h3>
                 <div id="typeButtons"></div>
@@ -567,9 +732,7 @@
                 </div>
             </div>
 
-            <!-- Panel derecho -->
             <div class="right-panel">
-                <!-- Visor con navegación y zoom -->
                 <div class="viewer-container" id="viewerContainer">
                     <canvas id="viewerCanvas"></canvas>
                     <div class="no-pdf-msg" id="noPdfMsg">Selecciona una página para visualizarla</div>
@@ -587,7 +750,6 @@
                     </div>
                 </div>
 
-                <!-- Galería con selector y botones de asignación -->
                 <div class="gallery">
                     <div class="gallery-header">
                         <span class="title">📎 Páginas (vista unificada)</span>
@@ -630,31 +792,160 @@
 
         <div class="footer"
             style="margin-top:1.5rem; border-top:1px solid #e9edf4; padding-top:0.8rem; font-size:0.75rem; color:#7a8fa6; text-align:center;">
-            Herramienta de tipificación. Ministerio de Salud Colombia
+            Herramienta de tipificación.Ministerio de Salud Colombia
         </div>
     </div>
 
     <div id="toast" class="toast"></div>
 
     <script>
+        /* ================================================================
+           LOGIN · Gestión de autenticación con archivo plano usuarios.json
+           ================================================================ */
+        const AUTH = (function () {
+            // Fallback embebido: se usa si NO se puede leer usuarios.json
+            // (por ejemplo si abres el index.html con doble clic y el
+            //  navegador bloquea fetch() por CORS en file://)
+            const USUARIOS_FALLBACK = [
+                {usuario: 'admin', password: 'admin123', nombre: 'Administrador'},
+                {usuario: 'facturacion', password: 'fact2024', nombre: 'Área de Facturación'},
+                {usuario: 'auditor', password: 'audit2024', nombre: 'Auditoría Interna'}
+            ];
+
+            const SESSION_KEY = 'tipif2284_user';
+
+            async function cargarUsuarios() {
+                try {
+                    const res = await fetch('usuarios.json', {cache: 'no-store'});
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const data = await res.json();
+                    if (Array.isArray(data.usuarios) && data.usuarios.length) {
+                        return data.usuarios;
+                    }
+                    throw new Error('Formato inválido');
+                } catch (e) {
+                    console.warn('[AUTH] No se pudo leer usuarios.json → usando lista embebida.', e);
+                    return USUARIOS_FALLBACK;
+                }
+            }
+
+            function validar(usuario, password, lista) {
+                return lista.find(u =>
+                    u.usuario.toLowerCase() === String(usuario).trim().toLowerCase() &&
+                    u.password === String(password)
+                ) || null;
+            }
+
+            function guardarSesion(user) {
+                try {
+                    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+                        usuario: user.usuario,
+                        nombre: user.nombre,
+                        ts: Date.now()
+                    }));
+                } catch (e) { /* noop */}
+            }
+
+            function obtenerSesion() {
+                try {
+                    const raw = sessionStorage.getItem(SESSION_KEY);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (e) {return null;}
+            }
+
+            function cerrarSesion() {
+                try {sessionStorage.removeItem(SESSION_KEY);} catch (e) { }
+            }
+
+            return {cargarUsuarios, validar, guardarSesion, obtenerSesion, cerrarSesion};
+        })();
+
+        // Inicialización del login ANTES de montar la app
+        (async function initLogin() {
+            const overlay = document.getElementById('loginOverlay');
+            const appCont = document.getElementById('appContainer');
+            const form = document.getElementById('loginForm');
+            const userInput = document.getElementById('loginUser');
+            const passInput = document.getElementById('loginPass');
+            const errorEl = document.getElementById('loginError');
+            const loginBtn = document.getElementById('loginBtn');
+            const userChip = document.getElementById('userChip');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            const usuarios = await AUTH.cargarUsuarios();
+
+            function mostrarApp(sesion) {
+                overlay.classList.add('hidden');
+                appCont.style.display = 'block';
+                if (sesion) userChip.textContent = '👤 ' + (sesion.nombre || sesion.usuario);
+                // Dispara el evento para que el script principal sepa que ya puede inicializar (si hace falta)
+                document.dispatchEvent(new CustomEvent('auth:ok', {detail: sesion}));
+            }
+
+            function mostrarLogin() {
+                overlay.classList.remove('hidden');
+                appCont.style.display = 'none';
+                passInput.value = '';
+                errorEl.textContent = '';
+                userInput.focus();
+            }
+
+            // ¿Ya hay sesión activa?
+            const sesionExistente = AUTH.obtenerSesion();
+            if (sesionExistente) {
+                mostrarApp(sesionExistente);
+            } else {
+                mostrarLogin();
+            }
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                errorEl.textContent = '';
+
+                const u = userInput.value.trim();
+                const p = passInput.value;
+
+                if (!u || !p) {
+                    errorEl.textContent = 'Completa usuario y contraseña.';
+                    return;
+                }
+
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Verificando…';
+
+                // pequeña espera para que se vea el estado (opcional)
+                setTimeout(() => {
+                    const user = AUTH.validar(u, p, usuarios);
+                    if (user) {
+                        AUTH.guardarSesion(user);
+                        mostrarApp({usuario: user.usuario, nombre: user.nombre});
+                    } else {
+                        errorEl.textContent = 'Usuario o contraseña incorrectos.';
+                        passInput.value = '';
+                        passInput.focus();
+                    }
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Ingresar';
+                }, 250);
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                if (!confirm('¿Cerrar sesión?')) return;
+                AUTH.cerrarSesion();
+                userInput.value = '';
+                mostrarLogin();
+            });
+        })();
+        /* ================================================================ */
+    </script>
+
+    <script>
         (function () {
-            // Colores para cada tipo (para el badge y el indicador)
             const TYPE_COLORS = {
-                'HEV': '#e74c3c',  // rojo
-                'EPI': '#3498db',  // azul
-                'PDX': '#2ecc71',  // verde
-                'DQX': '#f39c12',  // naranja
-                'RAN': '#9b59b6',  // morado
-                'CRC': '#1abc9c',  // turquesa
-                'TAP': '#e67e22',  // naranja oscuro
-                'TNA': '#2c3e50',  // gris oscuro
-                'FAT': '#e84393',  // rosado
-                'FMO': '#00b894',  // verde menta
-                'OPF': '#6c5ce7',  // índigo
-                'LDP': '#fd79a8',  // rosa
-                'HAU': '#00cec9',  // cian
-                'HAO': '#fdcb6e',  // amarillo
-                'HAM': '#a29bfe'   // lavanda
+                'HEV': '#e74c3c', 'EPI': '#3498db', 'PDX': '#2ecc71', 'DQX': '#f39c12',
+                'RAN': '#9b59b6', 'CRC': '#1abc9c', 'TAP': '#e67e22', 'TNA': '#2c3e50',
+                'FAT': '#e84393', 'FMO': '#00b894', 'OPF': '#6c5ce7', 'LDP': '#fd79a8',
+                'HAU': '#00cec9', 'HAO': '#fdcb6e', 'HAM': '#a29bfe'
             };
 
             const TIPOS = ['HEV', 'EPI', 'PDX', 'DQX', 'RAN', 'CRC', 'TAP', 'TNA', 'FAT', 'FMO', 'OPF', 'LDP', 'HAU', 'HAO', 'HAM'];
@@ -665,7 +956,6 @@
             let nextId = 1;
             let zoomScale = 1.0;
 
-            // DOM
             const typeButtonsDiv = document.getElementById('typeButtons');
             const viewerCanvas = document.getElementById('viewerCanvas');
             const ctx = viewerCanvas.getContext('2d');
@@ -702,13 +992,10 @@
                 toastEl._timer = setTimeout(() => toastEl.classList.remove('show'), 3000);
             }
 
-            // Renderizar botones de tipos con colores y contadores
             function renderTypeButtons() {
                 const counts = {};
                 TIPOS.forEach(t => counts[t] = 0);
-                pages.forEach(p => {
-                    if (p.tipo && counts[p.tipo] !== undefined) counts[p.tipo]++;
-                });
+                pages.forEach(p => {if (p.tipo && counts[p.tipo] !== undefined) counts[p.tipo]++;});
                 let html = '';
                 TIPOS.forEach(t => {
                     const count = counts[t] || 0;
@@ -718,7 +1005,6 @@
                 typeButtonsDiv.innerHTML = html;
             }
 
-            // Renderizar miniaturas con badge coloreado según tipo
             async function renderThumbnails() {
                 thumbnailsContainer.innerHTML = '';
                 if (pages.length === 0) {
@@ -741,7 +1027,6 @@
                     label.textContent = `${shortName} (p.${page.pageNum})`;
                     thumbDiv.appendChild(label);
 
-                    // Badge con color del tipo
                     if (page.tipo) {
                         const badge = document.createElement('span');
                         badge.className = 'thumb-badge';
@@ -788,7 +1073,6 @@
                 updateStats();
             }
 
-            // Seleccionar página y mostrar en visor
             async function selectPage(id) {
                 selectedPageId = id;
                 const page = pages.find(p => p.id === id);
@@ -812,7 +1096,6 @@
                 }
             }
 
-            // Renderizar página en el visor con zoom
             async function renderViewerPage(page) {
                 if (!page || !page.pageObj) return;
                 try {
@@ -820,7 +1103,6 @@
                     viewerCanvas.width = viewport.width;
                     viewerCanvas.height = viewport.height;
                     viewerCanvas.style.display = 'block';
-                    // Limpiar canvas antes de dibujar
                     ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
                     await page.pageObj.render({canvasContext: ctx, viewport}).promise;
                     currentPageNum.textContent = page.pageNum;
@@ -831,7 +1113,6 @@
                 }
             }
 
-            // Navegación
             function navigatePages(delta) {
                 if (!currentPageId) return;
                 const currentPage = pages.find(p => p.id === currentPageId);
@@ -841,9 +1122,7 @@
                 let newIdx = idx + delta;
                 if (newIdx < 0) newIdx = 0;
                 if (newIdx >= docPages.length) newIdx = docPages.length - 1;
-                if (newIdx !== idx) {
-                    selectPage(docPages[newIdx].id);
-                }
+                if (newIdx !== idx) selectPage(docPages[newIdx].id);
             }
 
             function goToPageNum() {
@@ -867,7 +1146,6 @@
                 }
             }
 
-            // Eliminar documento
             function removePage(id) {
                 const page = pages.find(p => p.id === id);
                 if (!page) return;
@@ -890,28 +1168,17 @@
                 assignedStats.textContent = `${assigned} asignadas`;
             }
 
-            // Acciones en bloque
             function applyBulkType() {
                 const tipo = bulkTypeSelect.value;
-                if (!tipo) {
-                    showToast('Selecciona un tipo.');
-                    return;
-                }
+                if (!tipo) {showToast('Selecciona un tipo.'); return;}
                 const checkboxes = document.querySelectorAll('.thumb-check:checked');
-                if (checkboxes.length === 0) {
-                    showToast('Selecciona al menos una página.');
-                    return;
-                }
+                if (checkboxes.length === 0) {showToast('Selecciona al menos una página.'); return;}
                 let count = 0;
                 checkboxes.forEach(cb => {
                     const id = parseInt(cb.dataset.pageId, 10);
                     const page = pages.find(p => p.id === id);
-                    if (page) {
-                        page.tipo = tipo;
-                        count++;
-                    }
+                    if (page) {page.tipo = tipo; count++;}
                 });
-                // Desmarcar todos los checkboxes
                 document.querySelectorAll('.thumb-check').forEach(cb => cb.checked = false);
                 renderAll();
                 showToast(`Tipo ${tipo} asignado a ${count} página(s).`);
@@ -928,11 +1195,8 @@
                 if (selectedPageId && pages.some(p => p.id === selectedPageId)) {
                     const page = pages.find(p => p.id === selectedPageId);
                     if (page) {
-                        if (currentPageId !== selectedPageId) {
-                            selectPage(selectedPageId);
-                        } else {
-                            renderViewerPage(page);
-                        }
+                        if (currentPageId !== selectedPageId) selectPage(selectedPageId);
+                        else renderViewerPage(page);
                     }
                 } else if (pages.length > 0) {
                     selectPage(pages[0].id);
@@ -946,7 +1210,6 @@
                 updateStats();
             }
 
-            // Cargar archivos PDF (corregido para múltiples)
             async function loadFiles(files) {
                 let loaded = 0;
                 const fileArray = Array.from(files);
@@ -963,16 +1226,9 @@
                         for (let i = 1; i <= numPages; i++) {
                             const page = await pdf.getPage(i);
                             pages.push({
-                                id: nextId++,
-                                docId: docId,
-                                file: file,
-                                name: file.name,
-                                pageNum: i,
-                                totalPages: numPages,
-                                tipo: null,
-                                arrayBuffer: arrayBuffer,
-                                pdfDoc: pdf,
-                                pageObj: page,
+                                id: nextId++, docId, file,
+                                name: file.name, pageNum: i, totalPages: numPages,
+                                tipo: null, arrayBuffer, pdfDoc: pdf, pageObj: page,
                             });
                         }
                         loaded++;
@@ -990,18 +1246,11 @@
                 }
             }
 
-            // Generar ZIP
             async function generarZip() {
-                if (pages.length === 0) {
-                    showToast('No hay páginas para procesar.');
-                    return;
-                }
+                if (pages.length === 0) {showToast('No hay páginas para procesar.'); return;}
                 const nit = nitInput.value.trim() || 'NIT';
                 const factura = facturaInput.value.trim() || 'FACT';
-                if (!nit || !factura) {
-                    showToast('Ingresa NIT y número de factura.');
-                    return;
-                }
+                if (!nit || !factura) {showToast('Ingresa NIT y número de factura.'); return;}
 
                 const groups = {};
                 let unassigned = 0;
@@ -1011,10 +1260,7 @@
                     groups[p.tipo].push(p);
                 });
 
-                if (Object.keys(groups).length === 0) {
-                    showToast('Ninguna página tiene tipo asignado.');
-                    return;
-                }
+                if (Object.keys(groups).length === 0) {showToast('Ninguna página tiene tipo asignado.'); return;}
                 if (unassigned > 0) {
                     if (!confirm(`Hay ${unassigned} página(s) sin asignar. ¿Continuar?`)) return;
                 }
@@ -1057,7 +1303,6 @@
                 showToast('Todo limpiado.');
             }
 
-            // Eventos
             function init() {
                 dropzoneGallery.addEventListener('dragover', (e) => {
                     e.preventDefault();
@@ -1073,9 +1318,7 @@
                 });
                 dropzoneGallery.addEventListener('click', () => fileInput.click());
                 fileInput.addEventListener('change', () => {
-                    if (fileInput.files.length) {
-                        loadFiles(fileInput.files);
-                    }
+                    if (fileInput.files.length) loadFiles(fileInput.files);
                     fileInput.value = '';
                 });
 
