@@ -760,7 +760,7 @@
 
         /* Cuando tiene al menos 1 asignado, el contador se vuelve llamativo */
         .type-btn.has-items .count {
-            background: currentColor;
+            background: var(--type-color, #0b3b5c);
             color: white;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             transform: scale(1.05);
@@ -2060,7 +2060,7 @@
                     const color = TYPE_COLORS[t] || '#888';
                     const hasItems = count > 0 ? 'has-items' : '';
                     html += `
-        <div class="type-btn ${hasItems}" style="color:${color}; border-left-color:${hasItems ? color : 'transparent'};" data-tipo="${t}">
+        <div class="type-btn ${hasItems}" style="--type-color:${color}; border-left-color:${hasItems ? color : 'transparent'};" data-tipo="${t}">
             <span class="color-indicator" style="background-color:${color};"></span>
             <span class="type-code" style="color:#1f3a57;">${t}</span>
             <span class="count" data-count="${count}">${count}</span>
