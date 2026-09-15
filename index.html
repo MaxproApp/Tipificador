@@ -2930,18 +2930,18 @@
             facturaInput.value = facturaInput.value.toUpperCase();
             facturaInput.setSelectionRange(pos, pos);
           });
-          function updateClock() {
-            const now = new Date();
-            const fecha = now.toLocaleDateString("es-CO");
-            const hora = now.toLocaleTimeString("es-CO");
-            const el = document.getElementById("liveClock");
-            if (el) el.textContent = `📅 ${fecha} · 🕐 ${hora}`;
-          }
-          updateClock();
-          setInterval(updateClock, 1000);
+
           renderAll();
         }
-
+        function updateClock() {
+          const now = new Date();
+          const fecha = now.toLocaleDateString("es-CO");
+          const hora = now.toLocaleTimeString("es-CO");
+          const el = document.getElementById("liveClock");
+          if (el) el.textContent = `📅 ${fecha} · 🕐 ${hora}`;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
         init();
       })();
     </script>
