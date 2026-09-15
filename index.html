@@ -1134,6 +1134,29 @@
             outline: 2px solid #0b3b5c;
             outline-offset: 2px;
         }
+
+        .nit-factura-fields input.input-error {
+            border-color: #c0392b !important;
+            background: #fdeaea;
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+            animation: input-shake 0.3s;
+        }
+
+        @keyframes input-shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
     </style>
 </head>
 
@@ -1186,7 +1209,8 @@
                 <div id="typeButtons"></div>
                 <div class="nit-factura-fields">
                     <label>NIT</label>
-                    <input type="text" id="nitInput" placeholder="819003652" />
+                    <input type="text" id="nitInput" placeholder="819003652" inputmode="numeric" pattern="[0-9]*"
+                        maxlength="15" />
                     <label>N° Factura</label>
                     <input type="text" id="facturaInput" placeholder="CRE0010" />
                     <button class="btn-generate" id="generarBtn">📦 Generar ZIP</button>
@@ -1882,13 +1906,47 @@
                     setTimeout(() => overlay.classList.remove('show'), 1600);
                 }
             }
-
+            // NIT: solo dígitos
+            nitInput.addEventListener('input', (e) => {
+                const limpio = e.target.value.replace(/\D/g, '');
+                if (e.target.value !== limpio) {
+                    e.target.value = limpio;
+                }
+                e.target.classList.remove('input-error');
+            });
+            // Factura: quitar espacios y limpiar error al escribir
+            facturaInput.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\s+/g, ' ').trimStart();
+                e.target.classList.remove('input-error');
+            });
             // ---- Función principal con progreso en tiempo real ----
             async function generarZip() {
                 if (pages.length === 0) {showToast('No hay páginas para procesar.'); return;}
-                const nit = nitInput.value.trim() || 'NIT';
-                const factura = facturaInput.value.trim() || 'FACT';
-                if (!nit || !factura) {showToast('Ingresa NIT y número de factura.'); return;}
+
+                const nit = nitInput.value.trim();
+                const factura = facturaInput.value.trim();
+                // ---- VALIDACIONES ----
+                nitInput.classList.remove('input-error');
+                facturaInput.classList.remove('input-error');
+
+                if (!nit) {
+                    nitInput.classList.add('input-error');
+                    nitInput.focus();
+                    showToast('⚠️ Ingresa el NIT antes de generar el ZIP.');
+                    return;
+                }
+                if (!/^\d+$/.test(nit)) {
+                    nitInput.classList.add('input-error');
+                    nitInput.focus();
+                    showToast('⚠️ El NIT solo debe contener números.');
+                    return;
+                }
+                if (!factura) {
+                    facturaInput.classList.add('input-error');
+                    facturaInput.focus();
+                    showToast('⚠️ Ingresa el número de factura antes de generar el ZIP.');
+                    return;
+                }
 
                 const groups = {};
                 let unassigned = 0;
