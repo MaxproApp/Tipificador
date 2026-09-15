@@ -429,39 +429,95 @@
         }
 
         .nit-factura-fields .btn-generate {
-            margin-top: 0.8rem;
+            margin-top: 1rem;
             width: 100%;
-            padding: 0.5rem;
-            background: #1b6b4a;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #1b6b4a 0%, #2a9d6e 100%);
             color: white;
             border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.9rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
             cursor: pointer;
-            transition: background 0.15s;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 4px 14px rgba(27, 107, 74, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s;
         }
 
         .nit-factura-fields .btn-generate:hover {
-            background: #1f7f58;
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 22px rgba(27, 107, 74, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            background: linear-gradient(135deg, #1f7f58 0%, #34b57e 100%);
+        }
+
+        .nit-factura-fields .btn-generate:active {
+            transform: translateY(0);
+            box-shadow:
+                0 2px 6px rgba(27, 107, 74, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        /* Brillo que recorre el botón al hacer hover */
+        .nit-factura-fields .btn-generate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.35) 50%,
+                    transparent 100%);
+            transition: left 0.6s ease;
+        }
+
+        .nit-factura-fields .btn-generate:hover::before {
+            left: 100%;
+        }
+
+        .nit-factura-fields .btn-generate:disabled {
+            background: #94a8bd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .nit-factura-fields .btn-clear {
             width: 100%;
-            margin-top: 0.4rem;
-            padding: 0.4rem;
-            background: transparent;
-            border: 1px solid #c4d2e2;
-            border-radius: 30px;
-            font-weight: 500;
+            margin-top: 0.6rem;
+            padding: 0.55rem 1rem;
+            background: #fff;
+            border: 1.5px solid #e0c4c4;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.82rem;
             cursor: pointer;
-            color: #5b6f88;
-            transition: background 0.15s;
-            font-size: 0.8rem;
+            color: #b03a3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            transition: all 0.18s ease;
         }
 
         .nit-factura-fields .btn-clear:hover {
-            background: #f0f6fe;
+            background: #fdeaea;
+            border-color: #c0392b;
+            color: #a83224;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(192, 57, 43, 0.15);
+        }
+
+        .nit-factura-fields .btn-clear:active {
+            transform: translateY(0);
+            box-shadow: none;
         }
 
         .right-panel {
@@ -508,17 +564,32 @@
         }
 
         .viewer-controls button {
-            background: white;
-            border: 1px solid #cbd7e6;
-            border-radius: 30px;
-            padding: 0.15rem 0.7rem;
+            background: #ffffff;
+            border: 1.5px solid #cbd7e6;
+            border-radius: 10px;
+            padding: 0.35rem 0.75rem;
             font-size: 0.8rem;
+            font-weight: 600;
+            color: #1f3a57;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
         }
 
         .viewer-controls button:hover {
-            background: #e8f0fa;
+            background: #f0f6fe;
+            border-color: #0b3b5c;
+            color: #0b3b5c;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(11, 59, 92, 0.12);
+        }
+
+        .viewer-controls button:active {
+            transform: translateY(0);
+            box-shadow: none;
         }
 
         .viewer-controls .page-indicator {
@@ -544,17 +615,32 @@
         }
 
         .viewer-controls .zoom-btn {
-            background: #0b3b5c;
+            background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
             color: white;
             border: none;
-            padding: 0.15rem 0.6rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
             cursor: pointer;
+            min-width: 34px;
+            box-shadow:
+                0 3px 10px rgba(11, 59, 92, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transition: all 0.15s ease;
         }
 
         .viewer-controls .zoom-btn:hover {
-            background: #1a5270;
+            background: linear-gradient(135deg, #1a5270 0%, #2a7295 100%);
+            transform: translateY(-1px);
+            box-shadow:
+                0 5px 14px rgba(11, 59, 92, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .viewer-controls .zoom-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(11, 59, 92, 0.35);
         }
 
         .gallery {
@@ -580,21 +666,48 @@
         }
 
         .gallery-header .dropzone-small {
-            border: 1px dashed #cbd7e6;
-            border-radius: 30px;
-            padding: 0.15rem 0.8rem;
+            border: 1.5px dashed #7f9fc7;
+            border-radius: 10px;
+            padding: 0.4rem 1rem;
             cursor: pointer;
-            font-size: 0.75rem;
-            color: #4b6483;
-            transition: background 0.15s;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #0b3b5c;
+            background: #f0f6fe;
+            transition: all 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
         }
 
         .gallery-header .dropzone-small:hover {
-            background: #eef3f9;
+            background: #e2edfb;
+            border-color: #0b3b5c;
+            border-style: solid;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(11, 59, 92, 0.12);
         }
 
         .gallery-header .dropzone-small input {
             display: none;
+        }
+
+        .nit-factura-fields input {
+            width: 100%;
+            padding: 0.45rem 0.6rem;
+            border: 1.5px solid #d0dbe9;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-top: 0.15rem;
+            background: #ffffff;
+            transition: border 0.15s, box-shadow 0.15s;
+            font-family: inherit;
+        }
+
+        .nit-factura-fields input:focus {
+            outline: none;
+            border-color: #0b3b5c;
+            box-shadow: 0 0 0 3px rgba(11, 59, 92, 0.12);
         }
 
         .bulk-actions {
@@ -614,32 +727,56 @@
         }
 
         .bulk-actions .btn {
-            padding: 0.2rem 1rem;
-            border-radius: 30px;
+            padding: 0.45rem 1.1rem;
+            border-radius: 10px;
             font-size: 0.8rem;
-            font-weight: 500;
+            font-weight: 600;
             border: none;
             cursor: pointer;
-            transition: background 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.18s ease;
+            letter-spacing: 0.01em;
         }
 
         .bulk-actions .btn-primary {
-            background: #0b3b5c;
+            background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
             color: white;
+            box-shadow:
+                0 3px 10px rgba(11, 59, 92, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
 
         .bulk-actions .btn-primary:hover {
-            background: #1a5270;
+            transform: translateY(-1px);
+            box-shadow:
+                0 6px 16px rgba(11, 59, 92, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .bulk-actions .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(11, 59, 92, 0.35);
         }
 
         .bulk-actions .btn-outline {
-            background: transparent;
-            border: 1px solid #c4d2e2;
+            background: #ffffff;
+            border: 1.5px solid #d0dbe9;
             color: #1f3a57;
+        }
+
+        .bulk-actions .btn-outline:active {
+            transform: translateY(0);
+            box-shadow: none;
         }
 
         .bulk-actions .btn-outline:hover {
             background: #f0f6fe;
+            border-color: #7f9fc7;
+            color: #0b3b5c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(11, 59, 92, 0.1);
         }
 
         .thumbnails {
@@ -988,6 +1125,15 @@
                 transform: scale(1);
             }
         }
+
+        button {
+            font-family: inherit;
+        }
+
+        button:focus-visible {
+            outline: 2px solid #0b3b5c;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 
@@ -1281,7 +1427,7 @@
             });
 
             // ----- Helper reutilizable para pedir confirmación -----
-            function pedirConfirmacion({titulo, mensaje, textoOk = 'Confirmar', icono = '⚠️'}) {
+            async function pedirConfirmacion({titulo, mensaje, textoOk = 'Confirmar', icono = '⚠️'}) {
                 return new Promise((resolve) => {
                     const overlay = document.getElementById('confirmModal');
                     const titleEl = document.getElementById('confirmTitle');
