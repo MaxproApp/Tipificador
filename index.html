@@ -1760,7 +1760,7 @@
           </div>
           <div class="header-title">
             <h1>Tipificación</h1>
-            <p>Separación de soportes de cobro</p>
+            <p id="inforp">Separación de soportes de cobro</p>
           </div>
         </div>
         <div class="header-right">
@@ -1895,7 +1895,8 @@
           color: #7a8fa6;
           text-align: center;
         "
-      >Herramienta de tipificación· Ministerio de Salud Colombia
+      >
+        Herramienta de tipificación· Ministerio de Salud Colombia
         <div
           id="prestadorInfo"
           style="
@@ -3008,7 +3009,7 @@
         }
         /* ====== BUSCADOR DE PRESTADOR POR NIT ====== */
         const prestadorInfo = document.getElementById("prestadorInfo");
-
+        const inforp = document.getElementById("infor");
         function actualizarPrestador() {
           const nit = nitInput.value.trim();
           if (!nit) {
@@ -3020,6 +3021,8 @@
           if (p) {
             prestadorInfo.textContent = `🏥 ${p.nombre_prestador.trim()} · Código: ${p.codigo_prestador}`;
             prestadorInfo.style.color = "#0b3b5c";
+            inforp.textContent = `${p.nombre_prestador.trim()}`;
+            inforp.style.color = "#0b3b5c";
           } else {
             prestadorInfo.textContent =
               "⚠️ NIT no encontrado en la lista de prestadores";
