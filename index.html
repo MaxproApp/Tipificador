@@ -3015,6 +3015,8 @@
           if (!nit) {
             prestadorInfo.textContent = "";
             prestadorInfo.style.color = "#7a8fa6";
+            inforp.textContent = "Separación de soportes de cobro";
+            inforp.style.color = "#0b3b5c";
             return;
           }
           const p = PRESTADORES.buscarPorNit(nit);
@@ -3027,6 +3029,8 @@
             prestadorInfo.textContent =
               "⚠️ NIT no encontrado en la lista de prestadores";
             prestadorInfo.style.color = "#c0392b";
+            inforp.textContent = "⚠️ NIT no encontrado en la lista de prestadores";
+            inforp.style.color = "#c0392b";
           }
         }
 
