@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="es">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tipificación - Gestor de PDFs</title>
@@ -10,2897 +9,3047 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #f4f7fc;
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        color: #1e293b;
+        padding: 1rem;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+      }
+
+      /* ========= LOGIN ========= */
+      .login-overlay {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(-45deg, #eaf2fb, #d6e5f5, #e8f5ee, #f4f7fc);
+        background-size: 400% 400%;
+        animation: login-bg-shift 18s ease infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 1rem;
+        overflow: hidden;
+      }
+
+      .login-overlay.hidden {
+        display: none;
+      }
+
+      @keyframes login-bg-shift {
+        0% {
+          background-position: 0% 50%;
         }
 
-        body {
-            background: #f4f7fc;
-            font-family:
-                "Inter",
-                -apple-system,
-                sans-serif;
-            color: #1e293b;
-            padding: 1rem;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+        50% {
+          background-position: 100% 50%;
         }
 
-        /* ========= LOGIN ========= */
-        .login-overlay {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(-45deg, #eaf2fb, #d6e5f5, #e8f5ee, #f4f7fc);
-            background-size: 400% 400%;
-            animation: login-bg-shift 18s ease infinite;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 1rem;
-            overflow: hidden;
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* ---- Orbes flotantes decorativos ---- */
+      .login-overlay::before,
+      .login-overlay::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      .login-overlay::before {
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, #7f9fc7, transparent 70%);
+        top: -100px;
+        left: -100px;
+        animation: orb-float 14s ease-in-out infinite;
+      }
+
+      .login-overlay::after {
+        width: 420px;
+        height: 420px;
+        background: radial-gradient(circle, #2a9d6e, transparent 70%);
+        bottom: -120px;
+        right: -120px;
+        animation: orb-float 18s ease-in-out infinite reverse;
+      }
+
+      @keyframes orb-float {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
         }
 
-        .login-overlay.hidden {
-            display: none;
+        50% {
+          transform: translate(40px, 30px) scale(1.15);
+        }
+      }
+
+      /* ---- Tarjeta ---- */
+      .login-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 24px;
+        box-shadow:
+          0 30px 80px rgba(11, 42, 64, 0.18),
+          0 1px 0 rgba(255, 255, 255, 0.9) inset,
+          0 0 0 1px rgba(11, 59, 92, 0.05);
+        padding: 2.4rem 2rem 1.8rem;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        z-index: 1;
+        animation: card-enter 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+      }
+
+      @keyframes card-enter {
+        from {
+          opacity: 0;
+          transform: translateY(30px) scale(0.95);
         }
 
-        @keyframes login-bg-shift {
-            0% {
-                background-position: 0% 50%;
-            }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
 
-            50% {
-                background-position: 100% 50%;
-            }
+      /* Línea de luz superior */
+      .login-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 10%;
+        right: 10%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(11, 59, 92, 0.35),
+          transparent
+        );
+        border-radius: 1px;
+      }
 
-            100% {
-                background-position: 0% 50%;
-            }
+      /* ---- Logo ---- */
+      .login-card .login-logo {
+        width: 150px;
+        max-width: 70%;
+        height: auto;
+        margin: 0 auto 1.2rem;
+        display: block;
+        animation:
+          logo-enter 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.3) 0.15s both,
+          logo-float 4s ease-in-out 1s infinite;
+        filter: drop-shadow(0 8px 20px rgba(11, 59, 92, 0.15));
+      }
+
+      @keyframes logo-enter {
+        from {
+          opacity: 0;
+          transform: scale(0.5) rotate(-8deg);
         }
 
-        /* ---- Orbes flotantes decorativos ---- */
-        .login-overlay::before,
-        .login-overlay::after {
-            content: "";
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.55;
-            pointer-events: none;
+        to {
+          opacity: 1;
+          transform: scale(1) rotate(0);
+        }
+      }
+
+      @keyframes logo-float {
+        0%,
+        100% {
+          transform: translateY(0);
         }
 
-        .login-overlay::before {
-            width: 380px;
-            height: 380px;
-            background: radial-gradient(circle, #7f9fc7, transparent 70%);
-            top: -100px;
-            left: -100px;
-            animation: orb-float 14s ease-in-out infinite;
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+
+      /* ---- Título ---- */
+      .login-card h2 {
+        font-size: 1.25rem;
+        color: #0b2a40;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        animation: fade-up 0.5s ease 0.35s both;
+      }
+
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
         }
 
-        .login-overlay::after {
-            width: 420px;
-            height: 420px;
-            background: radial-gradient(circle, #2a9d6e, transparent 70%);
-            bottom: -120px;
-            right: -120px;
-            animation: orb-float 18s ease-in-out infinite reverse;
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ---- Floating labels ---- */
+      .login-field {
+        position: relative;
+        margin-top: 1.2rem;
+        animation: fade-up 0.5s ease both;
+      }
+
+      .login-field:nth-of-type(1) {
+        animation-delay: 0.45s;
+      }
+
+      .login-field:nth-of-type(2) {
+        animation-delay: 0.55s;
+      }
+
+      .login-card .login-field input {
+        width: 100%;
+        padding: 0.95rem 1rem 0.5rem;
+        border: 1.5px solid #d0dbe9;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        background: rgba(255, 255, 255, 0.9);
+        color: #0b2a40;
+        transition: all 0.2s ease;
+      }
+
+      .login-card .login-field input:hover {
+        border-color: #a8bdd6;
+      }
+
+      .login-card .login-field input:focus {
+        outline: none;
+        border-color: #0b3b5c;
+        background: #ffffff;
+        box-shadow:
+          0 0 0 4px rgba(11, 59, 92, 0.1),
+          0 4px 12px rgba(11, 59, 92, 0.08);
+        transform: translateY(-1px);
+      }
+
+      /* La etiqueta flota arriba cuando el input tiene contenido o foco */
+      .login-card .login-field label {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #7a8fa6;
+        pointer-events: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background: transparent;
+        padding: 0 0.3rem;
+        text-align: left;
+        margin: 0;
+        display: block;
+      }
+
+      .login-card .login-field input:focus + label,
+      .login-card .login-field input:not(:placeholder-shown) + label,
+      .login-card .login-field input.filled + label {
+        top: 0;
+        font-size: 0.68rem;
+        color: #0b3b5c;
+        font-weight: 700;
+        background: #ffffff;
+        transform: translateY(-50%) scale(1);
+      }
+
+      /* Ícono dentro del input */
+      .login-card .login-field .field-icon {
+        position: absolute;
+        right: 0.9rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1rem;
+        opacity: 0.4;
+        transition: opacity 0.2s;
+        pointer-events: none;
+      }
+
+      .login-card .login-field input:focus ~ .field-icon {
+        opacity: 0.85;
+      }
+
+      /* ---- Botón ---- */
+      .login-card .login-submit {
+        width: 100%;
+        margin-top: 1.6rem;
+        padding: 0.85rem;
+        background: linear-gradient(
+          135deg,
+          #0b3b5c 0%,
+          #1a5270 50%,
+          #0b3b5c 100%
+        );
+        background-size: 200% 100%;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.03em;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        font-family: inherit;
+        box-shadow:
+          0 8px 24px rgba(11, 59, 92, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.2s ease,
+          background-position 0.6s ease;
+        animation: fade-up 0.5s ease 0.65s both;
+      }
+
+      .login-card .login-submit:hover {
+        background-position: 100% 0;
+        transform: translateY(-2px);
+        box-shadow:
+          0 12px 32px rgba(11, 59, 92, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      }
+
+      .login-card .login-submit:active {
+        transform: translateY(0);
+        box-shadow:
+          0 4px 12px rgba(11, 59, 92, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      .login-card .login-submit:disabled {
+        background: #94a8bd;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* Brillo deslizante */
+      .login-card .login-submit::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.35),
+          transparent
+        );
+        transition: left 0.7s ease;
+      }
+
+      .login-card .login-submit:hover::before {
+        left: 100%;
+      }
+
+      /* Spinner dentro del botón cuando está cargando */
+      .login-card .login-submit.loading {
+        color: transparent;
+        pointer-events: none;
+      }
+
+      .login-card .login-submit.loading::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin: -10px 0 0 -10px;
+        border: 2.5px solid rgba(255, 255, 255, 0.4);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: btn-spin 0.7s linear infinite;
+      }
+
+      @keyframes btn-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ---- Error ---- */
+      .login-error {
+        color: #c0392b;
+        font-size: 0.8rem;
+        margin-top: 0.9rem;
+        min-height: 1rem;
+        font-weight: 600;
+        opacity: 0;
+        transform: translateY(-4px);
+        transition:
+          opacity 0.25s,
+          transform 0.25s;
+      }
+
+      .login-error.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Shake cuando falla */
+      @keyframes login-shake {
+        0%,
+        100% {
+          transform: translateX(0);
         }
 
-        @keyframes orb-float {
-
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
-
-            50% {
-                transform: translate(40px, 30px) scale(1.15);
-            }
+        20% {
+          transform: translateX(-8px);
         }
 
-        /* ---- Tarjeta ---- */
-        .login-card {
-            position: relative;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            border-radius: 24px;
-            box-shadow:
-                0 30px 80px rgba(11, 42, 64, 0.18),
-                0 1px 0 rgba(255, 255, 255, 0.9) inset,
-                0 0 0 1px rgba(11, 59, 92, 0.05);
-            padding: 2.4rem 2rem 1.8rem;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            z-index: 1;
-            animation: card-enter 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+        40% {
+          transform: translateX(7px);
         }
 
-        @keyframes card-enter {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+        60% {
+          transform: translateX(-5px);
         }
 
-        /* Línea de luz superior */
-        .login-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg,
-                    transparent,
-                    rgba(11, 59, 92, 0.35),
-                    transparent);
-            border-radius: 1px;
+        80% {
+          transform: translateX(3px);
         }
+      }
 
-        /* ---- Logo ---- */
-        .login-card .login-logo {
-            width: 150px;
-            max-width: 70%;
-            height: auto;
-            margin: 0 auto 1.2rem;
-            display: block;
-            animation:
-                logo-enter 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.3) 0.15s both,
-                logo-float 4s ease-in-out 1s infinite;
-            filter: drop-shadow(0 8px 20px rgba(11, 59, 92, 0.15));
+      .login-card.shake {
+        animation: login-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+      }
+
+      /* ---- Hint ---- */
+      .login-hint {
+        font-size: 0.7rem;
+        color: #94a8bd;
+        margin-top: 1.4rem;
+        animation: fade-up 0.5s ease 0.75s both;
+      }
+
+      /* ========================= */
+      /* ========================= */
+
+      .app {
+        max-width: 1500px;
+        width: 100%;
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 20, 40, 0.08);
+        padding: 1.5rem 1.8rem;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #e9edf4;
+        padding-bottom: 1rem;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .logo {
+        width: 44px;
+        height: 44px;
+        background: #ffffff;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0, 20, 40, 0.08);
+      }
+
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 2px;
+      }
+
+      .header-title h1 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #0b2a40;
+      }
+
+      .header-title p {
+        font-size: 0.8rem;
+        color: #5b6f88;
+        margin-top: 2px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+
+      .header-badge {
+        background: #eef3f9;
+        padding: 0.3rem 1rem;
+        border-radius: 40px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #1f4a6e;
+      }
+
+      .user-chip {
+        background: #e6f5ee;
+        color: #1b6b4a;
+        padding: 0.3rem 0.9rem;
+        border-radius: 40px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .logout-btn {
+        background: transparent;
+        border: 1px solid #e0b8b8;
+        color: #b03a3a;
+        padding: 0.3rem 0.9rem;
+        border-radius: 40px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-family: inherit;
+      }
+
+      .logout-btn:hover {
+        background: #fdeaea;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 1.5rem;
+      }
+
+      @media (max-width: 900px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
         }
-
-        @keyframes logo-enter {
-            from {
-                opacity: 0;
-                transform: scale(0.5) rotate(-8deg);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) rotate(0);
-            }
-        }
-
-        @keyframes logo-float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-6px);
-            }
-        }
-
-        /* ---- Título ---- */
-        .login-card h2 {
-            font-size: 1.25rem;
-            color: #0b2a40;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-            animation: fade-up 0.5s ease 0.35s both;
-        }
-
-        @keyframes fade-up {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ---- Floating labels ---- */
-        .login-field {
-            position: relative;
-            margin-top: 1.2rem;
-            animation: fade-up 0.5s ease both;
-        }
-
-        .login-field:nth-of-type(1) {
-            animation-delay: 0.45s;
-        }
-
-        .login-field:nth-of-type(2) {
-            animation-delay: 0.55s;
-        }
-
-        .login-card .login-field input {
-            width: 100%;
-            padding: 0.95rem 1rem 0.5rem;
-            border: 1.5px solid #d0dbe9;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-family: inherit;
-            background: rgba(255, 255, 255, 0.9);
-            color: #0b2a40;
-            transition: all 0.2s ease;
-        }
-
-        .login-card .login-field input:hover {
-            border-color: #a8bdd6;
-        }
-
-        .login-card .login-field input:focus {
-            outline: none;
-            border-color: #0b3b5c;
-            background: #ffffff;
-            box-shadow:
-                0 0 0 4px rgba(11, 59, 92, 0.1),
-                0 4px 12px rgba(11, 59, 92, 0.08);
-            transform: translateY(-1px);
-        }
-
-        /* La etiqueta flota arriba cuando el input tiene contenido o foco */
-        .login-card .login-field label {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #7a8fa6;
-            pointer-events: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background: transparent;
-            padding: 0 0.3rem;
-            text-align: left;
-            margin: 0;
-            display: block;
-        }
-
-        .login-card .login-field input:focus+label,
-        .login-card .login-field input:not(:placeholder-shown)+label,
-        .login-card .login-field input.filled+label {
-            top: 0;
-            font-size: 0.68rem;
-            color: #0b3b5c;
-            font-weight: 700;
-            background: #ffffff;
-            transform: translateY(-50%) scale(1);
-        }
-
-        /* Ícono dentro del input */
-        .login-card .login-field .field-icon {
-            position: absolute;
-            right: 0.9rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1rem;
-            opacity: 0.4;
-            transition: opacity 0.2s;
-            pointer-events: none;
-        }
-
-        .login-card .login-field input:focus~.field-icon {
-            opacity: 0.85;
-        }
-
-        /* ---- Botón ---- */
-        .login-card .login-submit {
-            width: 100%;
-            margin-top: 1.6rem;
-            padding: 0.85rem;
-            background: linear-gradient(135deg,
-                    #0b3b5c 0%,
-                    #1a5270 50%,
-                    #0b3b5c 100%);
-            background-size: 200% 100%;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            font-family: inherit;
-            box-shadow:
-                0 8px 24px rgba(11, 59, 92, 0.35),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transition:
-                transform 0.15s ease,
-                box-shadow 0.2s ease,
-                background-position 0.6s ease;
-            animation: fade-up 0.5s ease 0.65s both;
-        }
-
-        .login-card .login-submit:hover {
-            background-position: 100% 0;
-            transform: translateY(-2px);
-            box-shadow:
-                0 12px 32px rgba(11, 59, 92, 0.45),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25);
-        }
-
-        .login-card .login-submit:active {
-            transform: translateY(0);
-            box-shadow:
-                0 4px 12px rgba(11, 59, 92, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-        }
-
-        .login-card .login-submit:disabled {
-            background: #94a8bd;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Brillo deslizante */
-        .login-card .login-submit::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.35),
-                    transparent);
-            transition: left 0.7s ease;
-        }
-
-        .login-card .login-submit:hover::before {
-            left: 100%;
-        }
-
-        /* Spinner dentro del botón cuando está cargando */
-        .login-card .login-submit.loading {
-            color: transparent;
-            pointer-events: none;
-        }
-
-        .login-card .login-submit.loading::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 2.5px solid rgba(255, 255, 255, 0.4);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: btn-spin 0.7s linear infinite;
-        }
-
-        @keyframes btn-spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ---- Error ---- */
-        .login-error {
-            color: #c0392b;
-            font-size: 0.8rem;
-            margin-top: 0.9rem;
-            min-height: 1rem;
-            font-weight: 600;
-            opacity: 0;
-            transform: translateY(-4px);
-            transition:
-                opacity 0.25s,
-                transform 0.25s;
-        }
-
-        .login-error.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Shake cuando falla */
-        @keyframes login-shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            20% {
-                transform: translateX(-8px);
-            }
-
-            40% {
-                transform: translateX(7px);
-            }
-
-            60% {
-                transform: translateX(-5px);
-            }
-
-            80% {
-                transform: translateX(3px);
-            }
-        }
-
-        .login-card.shake {
-            animation: login-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
-        }
-
-        /* ---- Hint ---- */
-        .login-hint {
-            font-size: 0.7rem;
-            color: #94a8bd;
-            margin-top: 1.4rem;
-            animation: fade-up 0.5s ease 0.75s both;
-        }
-
-        /* ========================= */
-        /* ========================= */
 
         .app {
-            max-width: 1500px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.08);
-            padding: 1.5rem 1.8rem;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e9edf4;
-            padding-bottom: 1rem;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo {
-            width: 44px;
-            height: 44px;
-            background: #ffffff;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0, 20, 40, 0.08);
-        }
-
-        .logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            padding: 2px;
-        }
-
-        .header-title h1 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #0b2a40;
-        }
-
-        .header-title p {
-            font-size: 0.8rem;
-            color: #5b6f88;
-            margin-top: 2px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-        }
-
-        .header-badge {
-            background: #eef3f9;
-            padding: 0.3rem 1rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #1f4a6e;
-        }
-
-        .user-chip {
-            background: #e6f5ee;
-            color: #1b6b4a;
-            padding: 0.3rem 0.9rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #e0b8b8;
-            color: #b03a3a;
-            padding: 0.3rem 0.9rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s;
-            font-family: inherit;
-        }
-
-        .logout-btn:hover {
-            background: #fdeaea;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 900px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .app {
-                padding: 1rem;
-            }
-        }
-
-        /* ========= MODAL DE CONFIRMACIÓN ========= */
-        .modal-confirm-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(11, 42, 64, 0.45);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1100;
-            padding: 1rem;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            pointer-events: none;
-        }
-
-        .modal-confirm-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-confirm {
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 24px 60px rgba(0, 20, 40, 0.25);
-            padding: 1.6rem 1.5rem 1.3rem;
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-            transform: translateY(12px) scale(0.97);
-            transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
-        }
-
-        .modal-confirm-overlay.show .modal-confirm {
-            transform: translateY(0) scale(1);
-        }
-
-        .modal-confirm .modal-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: #fdeaea;
-            color: #c0392b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin: 0 auto 0.9rem;
-        }
-
-        .modal-confirm h3 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #0b2a40;
-            margin-bottom: 0.4rem;
-        }
-
-        .modal-confirm p {
-            font-size: 0.85rem;
-            color: #5b6f88;
-            line-height: 1.45;
-            margin-bottom: 1.3rem;
-        }
-
-        .modal-confirm .modal-actions {
-            display: flex;
-            gap: 0.6rem;
-        }
-
-        .modal-confirm .modal-actions button {
-            flex: 1;
-            padding: 0.6rem 1rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            font-family: inherit;
-            transition:
-                background 0.15s,
-                transform 0.08s;
-        }
-
-        .modal-confirm .modal-actions button:active {
-            transform: scale(0.97);
-        }
-
-        .modal-confirm .btn-cancel {
-            background: #eef3f9;
-            color: #1f3a57;
-        }
-
-        .modal-confirm .btn-cancel:hover {
-            background: #e2eaf3;
-        }
-
-        .modal-confirm .btn-confirm {
-            background: #c0392b;
-            color: white;
-        }
-
-        .modal-confirm .btn-confirm:hover {
-            background: #a83224;
-        }
-
-        .types-panel {
-            background: #fafcff;
-            border: 1px solid #e5ebf3;
-            border-radius: 16px;
-            padding: 1rem;
-            height: fit-content;
-            position: sticky;
-            top: 1rem;
-        }
-
-        .types-panel h3 {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #0b2a40;
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            letter-spacing: 0.01em;
-            position: relative;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px dashed #d6e5f5;
-        }
-
-        .types-panel h3::after {
-            content: "";
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 30px;
-            height: 2px;
-            background: linear-gradient(90deg, #0b3b5c, #2a9d6e);
-            border-radius: 2px;
-        }
-
-        .type-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.55rem;
-            width: 100%;
-            text-align: left;
-            padding: 0.45rem 0.7rem;
-            margin-bottom: 0.3rem;
-            border: 1px solid #e3eaf3;
-            border-left: 4px solid transparent;
-            /* se colorea según el tipo */
-            border-radius: 10px;
-            background: #ffffff;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #1f3a57;
-            cursor: default;
-            position: relative;
-            overflow: hidden;
-            transition:
-                transform 0.18s ease,
-                box-shadow 0.18s ease,
-                border-color 0.18s ease,
-                background 0.18s ease;
-        }
-
-        /* Hover: se levanta, brilla y aparece una barra de color */
-        .type-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(11, 59, 92, 0.12);
-            background: #f8fbff;
-            border-color: #cbd7e6;
-        }
-
-        .type-btn:hover .color-indicator {
-            transform: scale(1.15);
-        }
-
-        /* Barra lateral de color que aparece al hover */
-        .type-btn::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: currentColor;
-            transform: scaleY(0);
-            transform-origin: center;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .type-btn:hover::before {
-            transform: scaleY(1);
-        }
-
-        /* Contador (pill a la derecha) */
-        .type-btn .count {
-            margin-left: auto;
-            background: #eef3f9;
-            padding: 0.1rem 0.55rem;
-            border-radius: 30px;
-            font-size: 0.68rem;
-            font-weight: 700;
-            color: #7a8fa6;
-            min-width: 26px;
-            text-align: center;
-            transition: all 0.25s ease;
-        }
-
-        /* Cuando tiene al menos 1 asignado, el contador se vuelve llamativo */
-        .type-btn.has-items .count {
-            background: var(--type-color, #0b3b5c);
-            color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            transform: scale(1.05);
-        }
-
-        /* Animación "pop" cuando el número cambia */
-        @keyframes count-pop {
-            0% {
-                transform: scale(1);
-            }
-
-            40% {
-                transform: scale(1.35);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .type-btn .count.pop {
-            animation: count-pop 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Cuando el tipo tiene al menos 1 página, el botón también cambia */
-        .type-btn.has-items {
-            background: linear-gradient(90deg,
-                    rgba(255, 255, 255, 1) 0%,
-                    #f7fbff 100%);
-            border-color: #d6e5f5;
-            box-shadow: 0 2px 8px rgba(11, 59, 92, 0.06);
-        }
-
-        /* Indicador de color (el circulito) */
-        .type-btn .color-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            box-shadow:
-                0 0 0 3px rgba(255, 255, 255, 1),
-                0 0 0 4px currentColor;
-            transition: transform 0.2s ease;
-        }
-
-        .nit-factura-fields {
-            margin-top: 1.2rem;
-            border-top: 1px solid #e5ebf3;
-            padding-top: 0.8rem;
-        }
-
-        .nit-factura-fields label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: #3a5778;
-            margin-top: 0.4rem;
-        }
-
-        .nit-factura-fields input {
-            width: 100%;
-            padding: 0.3rem 0.5rem;
-            border: 1px solid #d0dbe9;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-top: 0.1rem;
-        }
-
-        .nit-factura-fields .btn-generate {
-            margin-top: 1rem;
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: linear-gradient(135deg, #1b6b4a 0%, #2a9d6e 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            letter-spacing: 0.02em;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow:
-                0 4px 14px rgba(27, 107, 74, 0.35),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transition:
-                transform 0.15s ease,
-                box-shadow 0.2s ease,
-                background 0.2s;
-        }
-
-        .nit-factura-fields .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0 8px 22px rgba(27, 107, 74, 0.45),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25);
-            background: linear-gradient(135deg, #1f7f58 0%, #34b57e 100%);
-        }
-
-        .nit-factura-fields .btn-generate:active {
-            transform: translateY(0);
-            box-shadow:
-                0 2px 6px rgba(27, 107, 74, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-        }
-
-        /* Brillo que recorre el botón al hacer hover */
-        .nit-factura-fields .btn-generate::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg,
-                    transparent 0%,
-                    rgba(255, 255, 255, 0.35) 50%,
-                    transparent 100%);
-            transition: left 0.6s ease;
-        }
-
-        .nit-factura-fields .btn-generate:hover::before {
-            left: 100%;
-        }
-
-        .nit-factura-fields .btn-generate:disabled {
-            background: #94a8bd;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .nit-factura-fields .btn-clear {
-            width: 100%;
-            margin-top: 0.6rem;
-            padding: 0.55rem 1rem;
-            background: #fff;
-            border: 1.5px solid #e0c4c4;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.82rem;
-            cursor: pointer;
-            color: #b03a3a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            transition: all 0.18s ease;
-        }
-
-        .nit-factura-fields .btn-clear:hover {
-            background: #fdeaea;
-            border-color: #c0392b;
-            color: #a83224;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(192, 57, 43, 0.15);
-        }
-
-        .nit-factura-fields .btn-clear:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .viewer-container {
-            background: #f1f6fb;
-            border-radius: 16px;
-            border: 1px solid #dce5f0;
-            padding: 0.8rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            min-height: 300px;
-        }
-
-        .viewer-container canvas {
-            max-width: 100%;
-            max-height: 60vh;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            background: white;
-        }
-
-        .viewer-container .no-pdf-msg {
-            color: #8b9eb5;
-            font-size: 0.95rem;
-            text-align: center;
-        }
-
-        .viewer-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            margin-top: 0.6rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .viewer-controls button {
-            background: #ffffff;
-            border: 1.5px solid #cbd7e6;
-            border-radius: 10px;
-            padding: 0.35rem 0.75rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #1f3a57;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 34px;
-        }
-
-        .viewer-controls button:hover {
-            background: #f0f6fe;
-            border-color: #0b3b5c;
-            color: #0b3b5c;
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(11, 59, 92, 0.12);
-        }
-
-        .viewer-controls button:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
-        .viewer-controls .page-indicator {
-            font-weight: 500;
-            font-size: 0.8rem;
-            color: #1f3a57;
-        }
-
-        .viewer-controls input[type="number"] {
-            width: 50px;
-            padding: 0.15rem 0.2rem;
-            border: 1px solid #cbd7e6;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            text-align: center;
-        }
-
-        .viewer-controls .doc-name {
-            font-weight: 500;
-            color: #0b2a40;
-            margin-right: 0.3rem;
-            font-size: 0.8rem;
-        }
-
-        .viewer-controls .zoom-btn {
-            background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
-            color: white;
-            border: none;
-            padding: 0.35rem 0.75rem;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            cursor: pointer;
-            min-width: 34px;
-            box-shadow:
-                0 3px 10px rgba(11, 59, 92, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-            transition: all 0.15s ease;
-        }
-
-        .viewer-controls .zoom-btn:hover {
-            background: linear-gradient(135deg, #1a5270 0%, #2a7295 100%);
-            transform: translateY(-1px);
-            box-shadow:
-                0 5px 14px rgba(11, 59, 92, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .viewer-controls .zoom-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(11, 59, 92, 0.35);
-        }
-
-        .gallery {
-            background: #fafcff;
-            border: 1px solid #e5ebf3;
-            border-radius: 16px;
-            padding: 0.8rem;
-        }
-
-        .gallery-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.6rem;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-
-        .gallery-header .title {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #0b2a40;
-        }
-
-        .gallery-header .dropzone-small {
-            border: 1.5px dashed #7f9fc7;
-            border-radius: 10px;
-            padding: 0.4rem 1rem;
-            cursor: pointer;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: #0b3b5c;
-            background: #f0f6fe;
-            transition: all 0.18s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .gallery-header .dropzone-small:hover {
-            background: #e2edfb;
-            border-color: #0b3b5c;
-            border-style: solid;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(11, 59, 92, 0.12);
-        }
-
-        .gallery-header .dropzone-small input {
-            display: none;
-        }
-
-        .nit-factura-fields input {
-            width: 100%;
-            padding: 0.45rem 0.6rem;
-            border: 1.5px solid #d0dbe9;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            margin-top: 0.15rem;
-            background: #ffffff;
-            transition:
-                border 0.15s,
-                box-shadow 0.15s;
-            font-family: inherit;
-        }
-
-        .nit-factura-fields input:focus {
-            outline: none;
-            border-color: #0b3b5c;
-            box-shadow: 0 0 0 3px rgba(11, 59, 92, 0.12);
-        }
-
-        .bulk-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
-            margin: 0.4rem 0 0.6rem;
-        }
-
-        .bulk-actions select {
-            padding: 0.25rem 0.5rem;
-            border: 1px solid #d0dbe9;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            background: white;
-        }
-
-        .bulk-actions .btn {
-            padding: 0.45rem 1.1rem;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: all 0.18s ease;
-            letter-spacing: 0.01em;
-        }
-
-        .bulk-actions .btn-primary {
-            background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
-            color: white;
-            box-shadow:
-                0 3px 10px rgba(11, 59, 92, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-        }
-
-        .bulk-actions .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow:
-                0 6px 16px rgba(11, 59, 92, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .bulk-actions .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(11, 59, 92, 0.35);
-        }
-
-        .bulk-actions .btn-outline {
-            background: #ffffff;
-            border: 1.5px solid #d0dbe9;
-            color: #1f3a57;
-        }
-
-        .bulk-actions .btn-outline:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
-        .bulk-actions .btn-outline:hover {
-            background: #f0f6fe;
-            border-color: #7f9fc7;
-            color: #0b3b5c;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(11, 59, 92, 0.1);
-        }
-
-        .thumbnails {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            max-height: 260px;
-            overflow-y: auto;
-            padding: 0.3rem 0;
-        }
-
-        .thumb-item {
-            width: 100px;
-            border: 2px solid #e5ebf3;
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            transition:
-                border 0.15s,
-                transform 0.1s;
-            background: white;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .thumb-item:hover {
-            border-color: #7f9fc7;
-            transform: scale(1.02);
-        }
-
-        .thumb-item.selected {
-            border-color: #0b3b5c;
-            box-shadow: 0 0 0 2px #0b3b5c;
-        }
-
-        .thumb-item.tipo-asignado {
-            border-color: #1b6b4a;
-            background: #f0faf5;
-        }
-
-        .thumb-item .thumb-canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-            background: #f1f6fb;
-        }
-
-        .thumb-item .thumb-label {
-            padding: 0.2rem 0.2rem;
-            font-size: 0.55rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            background: #f8faff;
-            border-top: 1px solid #e5ebf3;
-            text-align: center;
-            font-weight: 500;
-            color: #1f3a57;
-        }
-
-        .thumb-item .thumb-badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: #0b3b5c;
-            color: white;
-            font-size: 0.5rem;
-            padding: 0.05rem 0.3rem;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .thumb-item .thumb-remove {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            background: rgba(200, 50, 50, 0.8);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            font-size: 9px;
-            line-height: 1;
-            cursor: pointer;
-            display: none;
-        }
-
-        .thumb-item:hover .thumb-remove {
-            display: block;
-        }
-
-        .thumb-item .thumb-remove:hover {
-            background: #a33;
-        }
-
-        .thumb-item .thumb-check {
-            position: absolute;
-            bottom: 6px;
-            right: 6px;
-            width: 22px;
-            height: 22px;
-            appearance: none;
-            -webkit-appearance: none;
-            background: #ffffff;
-            border: 2px solid #cbd7e6;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 6px rgba(11, 59, 92, 0.15);
-        }
-
-        /* Palomita interna (con SVG embebido) */
-        .thumb-item .thumb-check::after {
-            content: "";
-            width: 11px;
-            height: 11px;
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0;
-            transform: scale(0.3);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .thumb-item .thumb-check:hover {
-            border-color: #7f9fc7;
-            transform: scale(1.1);
-            box-shadow: 0 3px 10px rgba(11, 59, 92, 0.25);
-        }
-
-        .thumb-item .thumb-check:checked {
-            background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
-            border-color: #0b3b5c;
-            box-shadow: 0 3px 12px rgba(11, 59, 92, 0.45);
-        }
-
-        .thumb-item .thumb-check:checked::after {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* Pulso al marcar */
-        @keyframes check-pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(11, 59, 92, 0.5);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(11, 59, 92, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(11, 59, 92, 0);
-            }
-        }
-
-        .thumb-item .thumb-check:checked {
-            animation: check-pulse 0.5s ease-out;
-        }
-
-        .gallery-footer {
-            margin-top: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #5b6f88;
-            border-top: 1px solid #e9edf4;
-            padding-top: 0.4rem;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: white;
-            padding: 0.6rem 1.5rem;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 999;
-        }
-
-        .toast.show {
-            opacity: 1;
-        }
-
-        .thumbnails::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .thumbnails::-webkit-scrollbar-thumb {
-            background: #cbd7e6;
-            border-radius: 10px;
-        }
-
-        /* ========= OVERLAY DE CARGA ZIP ========= */
-        .zip-loader-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(11, 42, 64, 0.55);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1200;
-            padding: 1rem;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-
-        .zip-loader-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .zip-loader-card {
-            background: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 30px 80px rgba(0, 20, 40, 0.35);
-            padding: 2rem 2.2rem 1.8rem;
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-            transform: translateY(20px) scale(0.95);
-            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.3);
-        }
-
-        .zip-loader-overlay.show .zip-loader-card {
-            transform: translateY(0) scale(1);
-        }
-
-        /* --- Spinner circular animado --- */
-        .zip-spinner {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1.2rem;
-        }
-
-        .zip-spinner svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-
-        .zip-spinner-track {
-            fill: none;
-            stroke: #e6eef7;
-            stroke-width: 4;
-        }
-
-        .zip-spinner-head {
-            fill: none;
-            stroke: #0b3b5c;
-            stroke-width: 4;
-            stroke-linecap: round;
-            stroke-dasharray: 126;
-            stroke-dashoffset: 90;
-            animation: zip-dash 1.5s ease-in-out infinite;
-        }
-
-        @keyframes zip-dash {
-            0% {
-                stroke-dashoffset: 90;
-                transform: rotate(0deg);
-            }
-
-            50% {
-                stroke-dashoffset: 30;
-                transform: rotate(180deg);
-            }
-
-            100% {
-                stroke-dashoffset: 90;
-                transform: rotate(360deg);
-            }
-        }
-
-        .zip-spinner-icon {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            animation: zip-bounce 1.2s ease-in-out infinite;
-        }
-
-        @keyframes zip-bounce {
-
-            0%,
-            100% {
-                transform: translateY(0) scale(1);
-            }
-
-            50% {
-                transform: translateY(-4px) scale(1.08);
-            }
-        }
-
-        /* --- Textos --- */
-        .zip-loader-card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #0b2a40;
-            margin-bottom: 0.35rem;
-        }
-
-        .zip-loader-card p {
-            font-size: 0.85rem;
-            color: #5b6f88;
-            margin-bottom: 1.3rem;
-            min-height: 1.2em;
-        }
-
-        /* --- Barra de progreso --- */
-        .zip-progress {
-            width: 100%;
-            height: 8px;
-            background: #eef3f9;
-            border-radius: 30px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-            position: relative;
-        }
-
-        .zip-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #0b3b5c 0%, #1b6b4a 100%);
-            border-radius: 30px;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .zip-progress-bar::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg,
-                    transparent 0%,
-                    rgba(255, 255, 255, 0.35) 50%,
-                    transparent 100%);
-            animation: zip-shimmer 1.4s linear infinite;
-        }
-
-        @keyframes zip-shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        .zip-progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.72rem;
-            color: #5b6f88;
-            font-weight: 500;
-        }
-
-        .zip-progress-text #zipProgressPct {
-            color: #0b3b5c;
-            font-weight: 700;
-        }
-
-        /* --- Estado de éxito --- */
-        .zip-loader-card.success .zip-spinner-head {
-            stroke: #1b6b4a;
-            animation: none;
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 0.5s ease;
-        }
-
-        .zip-loader-card.success .zip-spinner-icon {
-            animation: zip-success-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.6);
-        }
-
-        @keyframes zip-success-pop {
-            0% {
-                transform: scale(0.4);
-                opacity: 0;
-            }
-
-            70% {
-                transform: scale(1.25);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        button {
-            font-family: inherit;
-        }
-
-        button:focus-visible {
-            outline: 2px solid #0b3b5c;
-            outline-offset: 2px;
-        }
-
-        .nit-factura-fields input.input-error {
-            border-color: #c0392b !important;
-            background: #fdeaea;
-            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
-            animation: input-shake 0.3s;
-        }
-
-        @keyframes input-shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-4px);
-            }
-
-            75% {
-                transform: translateX(4px);
-            }
-        }
-
-        @keyframes type-btn-enter {
-            from {
-                opacity: 0;
-                transform: translateX(-8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .type-btn {
-            animation: type-btn-enter 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
-        }
-
-        @keyframes select-reset {
-            0% {
-                background: #d4f1e0;
-                border-color: #2a9d6e;
-            }
-
-            100% {
-                background: #ffffff;
-                border-color: #d0dbe9;
-            }
-        }
-
-        .bulk-actions select.reset-flash {
-            animation: select-reset 0.6s ease-out;
-        }
-
-        #facturaInput {
-            text-transform: uppercase;
-        }
+          padding: 1rem;
+        }
+      }
+
+      /* ========= MODAL DE CONFIRMACIÓN ========= */
+      .modal-confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(11, 42, 64, 0.45);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1100;
+        padding: 1rem;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+      }
+
+      .modal-confirm-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-confirm {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 24px 60px rgba(0, 20, 40, 0.25);
+        padding: 1.6rem 1.5rem 1.3rem;
+        width: 100%;
+        max-width: 360px;
+        text-align: center;
+        transform: translateY(12px) scale(0.97);
+        transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      }
+
+      .modal-confirm-overlay.show .modal-confirm {
+        transform: translateY(0) scale(1);
+      }
+
+      .modal-confirm .modal-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: #fdeaea;
+        color: #c0392b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin: 0 auto 0.9rem;
+      }
+
+      .modal-confirm h3 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #0b2a40;
+        margin-bottom: 0.4rem;
+      }
+
+      .modal-confirm p {
+        font-size: 0.85rem;
+        color: #5b6f88;
+        line-height: 1.45;
+        margin-bottom: 1.3rem;
+      }
+
+      .modal-confirm .modal-actions {
+        display: flex;
+        gap: 0.6rem;
+      }
+
+      .modal-confirm .modal-actions button {
+        flex: 1;
+        padding: 0.6rem 1rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+        transition:
+          background 0.15s,
+          transform 0.08s;
+      }
+
+      .modal-confirm .modal-actions button:active {
+        transform: scale(0.97);
+      }
+
+      .modal-confirm .btn-cancel {
+        background: #eef3f9;
+        color: #1f3a57;
+      }
+
+      .modal-confirm .btn-cancel:hover {
+        background: #e2eaf3;
+      }
+
+      .modal-confirm .btn-confirm {
+        background: #c0392b;
+        color: white;
+      }
+
+      .modal-confirm .btn-confirm:hover {
+        background: #a83224;
+      }
+
+      .types-panel {
+        background: #fafcff;
+        border: 1px solid #e5ebf3;
+        border-radius: 16px;
+        padding: 1rem;
+        height: fit-content;
+        position: sticky;
+        top: 1rem;
+      }
+
+      .types-panel h3 {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #0b2a40;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        letter-spacing: 0.01em;
+        position: relative;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px dashed #d6e5f5;
+      }
+
+      .types-panel h3::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 30px;
+        height: 2px;
+        background: linear-gradient(90deg, #0b3b5c, #2a9d6e);
+        border-radius: 2px;
+      }
+
+      .type-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        width: 100%;
+        text-align: left;
+        padding: 0.45rem 0.7rem;
+        margin-bottom: 0.3rem;
+        border: 1px solid #e3eaf3;
+        border-left: 4px solid transparent;
+        /* se colorea según el tipo */
+        border-radius: 10px;
+        background: #ffffff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #1f3a57;
+        cursor: default;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease,
+          border-color 0.18s ease,
+          background 0.18s ease;
+      }
+
+      /* Hover: se levanta, brilla y aparece una barra de color */
+      .type-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(11, 59, 92, 0.12);
+        background: #f8fbff;
+        border-color: #cbd7e6;
+      }
+
+      .type-btn:hover .color-indicator {
+        transform: scale(1.15);
+      }
+
+      /* Barra lateral de color que aparece al hover */
+      .type-btn::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: currentColor;
+        transform: scaleY(0);
+        transform-origin: center;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .type-btn:hover::before {
+        transform: scaleY(1);
+      }
+
+      /* Contador (pill a la derecha) */
+      .type-btn .count {
+        margin-left: auto;
+        background: #eef3f9;
+        padding: 0.1rem 0.55rem;
+        border-radius: 30px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #7a8fa6;
+        min-width: 26px;
+        text-align: center;
+        transition: all 0.25s ease;
+      }
+
+      /* Cuando tiene al menos 1 asignado, el contador se vuelve llamativo */
+      .type-btn.has-items .count {
+        background: var(--type-color, #0b3b5c);
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transform: scale(1.05);
+      }
+
+      /* Animación "pop" cuando el número cambia */
+      @keyframes count-pop {
+        0% {
+          transform: scale(1);
+        }
+
+        40% {
+          transform: scale(1.35);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .type-btn .count.pop {
+        animation: count-pop 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Cuando el tipo tiene al menos 1 página, el botón también cambia */
+      .type-btn.has-items {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 1) 0%,
+          #f7fbff 100%
+        );
+        border-color: #d6e5f5;
+        box-shadow: 0 2px 8px rgba(11, 59, 92, 0.06);
+      }
+
+      /* Indicador de color (el circulito) */
+      .type-btn .color-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow:
+          0 0 0 3px rgba(255, 255, 255, 1),
+          0 0 0 4px currentColor;
+        transition: transform 0.2s ease;
+      }
+
+      .nit-factura-fields {
+        margin-top: 1.2rem;
+        border-top: 1px solid #e5ebf3;
+        padding-top: 0.8rem;
+      }
+
+      .nit-factura-fields label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: #3a5778;
+        margin-top: 0.4rem;
+      }
+
+      .nit-factura-fields input {
+        width: 100%;
+        padding: 0.3rem 0.5rem;
+        border: 1px solid #d0dbe9;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        margin-top: 0.1rem;
+      }
+
+      .nit-factura-fields .btn-generate {
+        margin-top: 1rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, #1b6b4a 0%, #2a9d6e 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+          0 4px 14px rgba(27, 107, 74, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.2s ease,
+          background 0.2s;
+      }
+
+      .nit-factura-fields .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 8px 22px rgba(27, 107, 74, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        background: linear-gradient(135deg, #1f7f58 0%, #34b57e 100%);
+      }
+
+      .nit-factura-fields .btn-generate:active {
+        transform: translateY(0);
+        box-shadow:
+          0 2px 6px rgba(27, 107, 74, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      /* Brillo que recorre el botón al hacer hover */
+      .nit-factura-fields .btn-generate::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.35) 50%,
+          transparent 100%
+        );
+        transition: left 0.6s ease;
+      }
+
+      .nit-factura-fields .btn-generate:hover::before {
+        left: 100%;
+      }
+
+      .nit-factura-fields .btn-generate:disabled {
+        background: #94a8bd;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .nit-factura-fields .btn-clear {
+        width: 100%;
+        margin-top: 0.6rem;
+        padding: 0.55rem 1rem;
+        background: #fff;
+        border: 1.5px solid #e0c4c4;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        cursor: pointer;
+        color: #b03a3a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        transition: all 0.18s ease;
+      }
+
+      .nit-factura-fields .btn-clear:hover {
+        background: #fdeaea;
+        border-color: #c0392b;
+        color: #a83224;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(192, 57, 43, 0.15);
+      }
+
+      .nit-factura-fields .btn-clear:active {
+        transform: translateY(0);
+        box-shadow: none;
+      }
+
+      .right-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .viewer-container {
+        background: #f1f6fb;
+        border-radius: 16px;
+        border: 1px solid #dce5f0;
+        padding: 0.8rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        min-height: 300px;
+      }
+
+      .viewer-container canvas {
+        max-width: 100%;
+        max-height: 60vh;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        background: white;
+      }
+
+      .viewer-container .no-pdf-msg {
+        color: #8b9eb5;
+        font-size: 0.95rem;
+        text-align: center;
+      }
+
+      .viewer-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-top: 0.6rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .viewer-controls button {
+        background: #ffffff;
+        border: 1.5px solid #cbd7e6;
+        border-radius: 10px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #1f3a57;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+      }
+
+      .viewer-controls button:hover {
+        background: #f0f6fe;
+        border-color: #0b3b5c;
+        color: #0b3b5c;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(11, 59, 92, 0.12);
+      }
+
+      .viewer-controls button:active {
+        transform: translateY(0);
+        box-shadow: none;
+      }
+
+      .viewer-controls .page-indicator {
+        font-weight: 500;
+        font-size: 0.8rem;
+        color: #1f3a57;
+      }
+
+      .viewer-controls input[type="number"] {
+        width: 50px;
+        padding: 0.15rem 0.2rem;
+        border: 1px solid #cbd7e6;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        text-align: center;
+      }
+
+      .viewer-controls .doc-name {
+        font-weight: 500;
+        color: #0b2a40;
+        margin-right: 0.3rem;
+        font-size: 0.8rem;
+      }
+
+      .viewer-controls .zoom-btn {
+        background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
+        color: white;
+        border: none;
+        padding: 0.35rem 0.75rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        min-width: 34px;
+        box-shadow:
+          0 3px 10px rgba(11, 59, 92, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        transition: all 0.15s ease;
+      }
+
+      .viewer-controls .zoom-btn:hover {
+        background: linear-gradient(135deg, #1a5270 0%, #2a7295 100%);
+        transform: translateY(-1px);
+        box-shadow:
+          0 5px 14px rgba(11, 59, 92, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .viewer-controls .zoom-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(11, 59, 92, 0.35);
+      }
+
+      .gallery {
+        background: #fafcff;
+        border: 1px solid #e5ebf3;
+        border-radius: 16px;
+        padding: 0.8rem;
+      }
+
+      .gallery-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.6rem;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+
+      .gallery-header .title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #0b2a40;
+      }
+
+      .gallery-header .dropzone-small {
+        border: 1.5px dashed #7f9fc7;
+        border-radius: 10px;
+        padding: 0.4rem 1rem;
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #0b3b5c;
+        background: #f0f6fe;
+        transition: all 0.18s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+
+      .gallery-header .dropzone-small:hover {
+        background: #e2edfb;
+        border-color: #0b3b5c;
+        border-style: solid;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(11, 59, 92, 0.12);
+      }
+
+      .gallery-header .dropzone-small input {
+        display: none;
+      }
+
+      .nit-factura-fields input {
+        width: 100%;
+        padding: 0.45rem 0.6rem;
+        border: 1.5px solid #d0dbe9;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        margin-top: 0.15rem;
+        background: #ffffff;
+        transition:
+          border 0.15s,
+          box-shadow 0.15s;
+        font-family: inherit;
+      }
+
+      .nit-factura-fields input:focus {
+        outline: none;
+        border-color: #0b3b5c;
+        box-shadow: 0 0 0 3px rgba(11, 59, 92, 0.12);
+      }
+
+      .bulk-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+        margin: 0.4rem 0 0.6rem;
+      }
+
+      .bulk-actions select {
+        padding: 0.25rem 0.5rem;
+        border: 1px solid #d0dbe9;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        background: white;
+      }
+
+      .bulk-actions .btn {
+        padding: 0.45rem 1.1rem;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all 0.18s ease;
+        letter-spacing: 0.01em;
+      }
+
+      .bulk-actions .btn-primary {
+        background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
+        color: white;
+        box-shadow:
+          0 3px 10px rgba(11, 59, 92, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      .bulk-actions .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow:
+          0 6px 16px rgba(11, 59, 92, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .bulk-actions .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(11, 59, 92, 0.35);
+      }
+
+      .bulk-actions .btn-outline {
+        background: #ffffff;
+        border: 1.5px solid #d0dbe9;
+        color: #1f3a57;
+      }
+
+      .bulk-actions .btn-outline:active {
+        transform: translateY(0);
+        box-shadow: none;
+      }
+
+      .bulk-actions .btn-outline:hover {
+        background: #f0f6fe;
+        border-color: #7f9fc7;
+        color: #0b3b5c;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(11, 59, 92, 0.1);
+      }
+
+      .thumbnails {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        max-height: 260px;
+        overflow-y: auto;
+        padding: 0.3rem 0;
+      }
+
+      .thumb-item {
+        width: 100px;
+        border: 2px solid #e5ebf3;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition:
+          border 0.15s,
+          transform 0.1s;
+        background: white;
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .thumb-item:hover {
+        border-color: #7f9fc7;
+        transform: scale(1.02);
+      }
+
+      .thumb-item.selected {
+        border-color: #0b3b5c;
+        box-shadow: 0 0 0 2px #0b3b5c;
+      }
+
+      .thumb-item.tipo-asignado {
+        border-color: #1b6b4a;
+        background: #f0faf5;
+      }
+
+      .thumb-item .thumb-canvas {
+        width: 100%;
+        height: auto;
+        display: block;
+        background: #f1f6fb;
+      }
+
+      .thumb-item .thumb-label {
+        padding: 0.2rem 0.2rem;
+        font-size: 0.55rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        background: #f8faff;
+        border-top: 1px solid #e5ebf3;
+        text-align: center;
+        font-weight: 500;
+        color: #1f3a57;
+      }
+
+      .thumb-item .thumb-badge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: #0b3b5c;
+        color: white;
+        font-size: 0.5rem;
+        padding: 0.05rem 0.3rem;
+        border-radius: 20px;
+        font-weight: 600;
+      }
+
+      .thumb-item .thumb-remove {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        background: rgba(200, 50, 50, 0.8);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        font-size: 9px;
+        line-height: 1;
+        cursor: pointer;
+        display: none;
+      }
+
+      .thumb-item:hover .thumb-remove {
+        display: block;
+      }
+
+      .thumb-item .thumb-remove:hover {
+        background: #a33;
+      }
+
+      .thumb-item .thumb-check {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        width: 22px;
+        height: 22px;
+        appearance: none;
+        -webkit-appearance: none;
+        background: #ffffff;
+        border: 2px solid #cbd7e6;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 6px rgba(11, 59, 92, 0.15);
+      }
+
+      /* Palomita interna (con SVG embebido) */
+      .thumb-item .thumb-check::after {
+        content: "";
+        width: 11px;
+        height: 11px;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0;
+        transform: scale(0.3);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .thumb-item .thumb-check:hover {
+        border-color: #7f9fc7;
+        transform: scale(1.1);
+        box-shadow: 0 3px 10px rgba(11, 59, 92, 0.25);
+      }
+
+      .thumb-item .thumb-check:checked {
+        background: linear-gradient(135deg, #0b3b5c 0%, #1a5270 100%);
+        border-color: #0b3b5c;
+        box-shadow: 0 3px 12px rgba(11, 59, 92, 0.45);
+      }
+
+      .thumb-item .thumb-check:checked::after {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      /* Pulso al marcar */
+      @keyframes check-pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(11, 59, 92, 0.5);
+        }
+
+        70% {
+          box-shadow: 0 0 0 10px rgba(11, 59, 92, 0);
+        }
+
+        100% {
+          box-shadow: 0 0 0 0 rgba(11, 59, 92, 0);
+        }
+      }
+
+      .thumb-item .thumb-check:checked {
+        animation: check-pulse 0.5s ease-out;
+      }
+
+      .gallery-footer {
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #5b6f88;
+        border-top: 1px solid #e9edf4;
+        padding-top: 0.4rem;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1e293b;
+        color: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 40px;
+        font-size: 0.85rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        z-index: 999;
+      }
+
+      .toast.show {
+        opacity: 1;
+      }
+
+      .thumbnails::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .thumbnails::-webkit-scrollbar-thumb {
+        background: #cbd7e6;
+        border-radius: 10px;
+      }
+
+      /* ========= OVERLAY DE CARGA ZIP ========= */
+      .zip-loader-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(11, 42, 64, 0.55);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1200;
+        padding: 1rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+
+      .zip-loader-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .zip-loader-card {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 30px 80px rgba(0, 20, 40, 0.35);
+        padding: 2rem 2.2rem 1.8rem;
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+        transform: translateY(20px) scale(0.95);
+        transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+      }
+
+      .zip-loader-overlay.show .zip-loader-card {
+        transform: translateY(0) scale(1);
+      }
+
+      /* --- Spinner circular animado --- */
+      .zip-spinner {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.2rem;
+      }
+
+      .zip-spinner svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      .zip-spinner-track {
+        fill: none;
+        stroke: #e6eef7;
+        stroke-width: 4;
+      }
+
+      .zip-spinner-head {
+        fill: none;
+        stroke: #0b3b5c;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-dasharray: 126;
+        stroke-dashoffset: 90;
+        animation: zip-dash 1.5s ease-in-out infinite;
+      }
+
+      @keyframes zip-dash {
+        0% {
+          stroke-dashoffset: 90;
+          transform: rotate(0deg);
+        }
+
+        50% {
+          stroke-dashoffset: 30;
+          transform: rotate(180deg);
+        }
+
+        100% {
+          stroke-dashoffset: 90;
+          transform: rotate(360deg);
+        }
+      }
+
+      .zip-spinner-icon {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        animation: zip-bounce 1.2s ease-in-out infinite;
+      }
+
+      @keyframes zip-bounce {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+        }
+
+        50% {
+          transform: translateY(-4px) scale(1.08);
+        }
+      }
+
+      /* --- Textos --- */
+      .zip-loader-card h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0b2a40;
+        margin-bottom: 0.35rem;
+      }
+
+      .zip-loader-card p {
+        font-size: 0.85rem;
+        color: #5b6f88;
+        margin-bottom: 1.3rem;
+        min-height: 1.2em;
+      }
+
+      /* --- Barra de progreso --- */
+      .zip-progress {
+        width: 100%;
+        height: 8px;
+        background: #eef3f9;
+        border-radius: 30px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+        position: relative;
+      }
+
+      .zip-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #0b3b5c 0%, #1b6b4a 100%);
+        border-radius: 30px;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .zip-progress-bar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.35) 50%,
+          transparent 100%
+        );
+        animation: zip-shimmer 1.4s linear infinite;
+      }
+
+      @keyframes zip-shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .zip-progress-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.72rem;
+        color: #5b6f88;
+        font-weight: 500;
+      }
+
+      .zip-progress-text #zipProgressPct {
+        color: #0b3b5c;
+        font-weight: 700;
+      }
+
+      /* --- Estado de éxito --- */
+      .zip-loader-card.success .zip-spinner-head {
+        stroke: #1b6b4a;
+        animation: none;
+        stroke-dashoffset: 0;
+        transition: stroke-dashoffset 0.5s ease;
+      }
+
+      .zip-loader-card.success .zip-spinner-icon {
+        animation: zip-success-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.6);
+      }
+
+      @keyframes zip-success-pop {
+        0% {
+          transform: scale(0.4);
+          opacity: 0;
+        }
+
+        70% {
+          transform: scale(1.25);
+          opacity: 1;
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      button {
+        font-family: inherit;
+      }
+
+      button:focus-visible {
+        outline: 2px solid #0b3b5c;
+        outline-offset: 2px;
+      }
+
+      .nit-factura-fields input.input-error {
+        border-color: #c0392b !important;
+        background: #fdeaea;
+        box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+        animation: input-shake 0.3s;
+      }
+
+      @keyframes input-shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+
+        25% {
+          transform: translateX(-4px);
+        }
+
+        75% {
+          transform: translateX(4px);
+        }
+      }
+
+      @keyframes type-btn-enter {
+        from {
+          opacity: 0;
+          transform: translateX(-8px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .type-btn {
+        animation: type-btn-enter 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
+      }
+
+      @keyframes select-reset {
+        0% {
+          background: #d4f1e0;
+          border-color: #2a9d6e;
+        }
+
+        100% {
+          background: #ffffff;
+          border-color: #d0dbe9;
+        }
+      }
+
+      .bulk-actions select.reset-flash {
+        animation: select-reset 0.6s ease-out;
+      }
+
+      #facturaInput {
+        text-transform: uppercase;
+      }
+      #prestadorInfo {
+        opacity: 0;
+        transform: translateY(-4px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease,
+          color 0.3s ease;
+      }
+      #prestadorInfo:not(:empty) {
+        opacity: 1;
+        transform: translateY(0);
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- ================= LOGIN OVERLAY ================= -->
     <div id="loginOverlay" class="login-overlay">
-        <form class="login-card" id="loginForm" autocomplete="on">
-            <img src="logo.jpg" alt="PDF Splitter" class="login-logo" onerror="this.style.display = 'none'" />
-            <h2>Iniciar sesión</h2>
+      <form class="login-card" id="loginForm" autocomplete="on">
+        <img
+          src="logo.jpg"
+          alt="PDF Splitter"
+          class="login-logo"
+          onerror="this.style.display = 'none'"
+        />
+        <h2>Iniciar sesión</h2>
 
-            <div class="login-field">
-                <input type="text" id="loginUser" placeholder=" " autocomplete="username" required />
-                <label for="loginUser">Usuario</label>
-                <span class="field-icon">👤</span>
-            </div>
+        <div class="login-field">
+          <input
+            type="text"
+            id="loginUser"
+            placeholder=" "
+            autocomplete="username"
+            required
+          />
+          <label for="loginUser">Usuario</label>
+          <span class="field-icon">👤</span>
+        </div>
 
-            <div class="login-field">
-                <input type="password" id="loginPass" placeholder=" " autocomplete="current-password" required />
-                <label for="loginPass">Contraseña</label>
-                <span class="field-icon">🔒</span>
-            </div>
+        <div class="login-field">
+          <input
+            type="password"
+            id="loginPass"
+            placeholder=" "
+            autocomplete="current-password"
+            required
+          />
+          <label for="loginPass">Contraseña</label>
+          <span class="field-icon">🔒</span>
+        </div>
 
-            <button type="submit" id="loginBtn" class="login-submit">
-                Ingresar
-            </button>
-            <div class="login-error" id="loginError"></div>
-            <div class="login-hint">Sistema de tipificación · Resolución 2284</div>
-        </form>
+        <button type="submit" id="loginBtn" class="login-submit">
+          Ingresar
+        </button>
+        <div class="login-error" id="loginError"></div>
+        <div class="login-hint">Sistema de tipificación · Resolución 2284</div>
+      </form>
     </div>
     <!-- ================================================= -->
 
     <div class="app" id="appContainer" style="display: none">
-        <div class="header">
-            <div class="header-left">
-                <div class="logo">
-                    <img src="logo1.png" alt="PDF Splitter" />
-                </div>
-                <div class="header-title">
-                    <h1>Tipificación</h1>
-                    <p>Separación de soportes de cobro</p>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="header-badge" id="liveClock">
-                    📅 --/--/---- · 🕐 --:--:--
-                </div>
-                <!-- LOGIN: chip del usuario + logout -->
-                <span class="user-chip" id="userChip">👤</span>
-                <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
-            </div>
+      <div class="header">
+        <div class="header-left">
+          <div class="logo">
+            <img src="logo1.png" alt="PDF Splitter" />
+          </div>
+          <div class="header-title">
+            <h1>Tipificación</h1>
+            <p>Separación de soportes de cobro</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="header-badge" id="liveClock">
+            📅 --/--/---- · 🕐 --:--:--
+          </div>
+          <!-- LOGIN: chip del usuario + logout -->
+          <span class="user-chip" id="userChip">👤</span>
+          <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div class="types-panel">
+          <h3>📌 Asignar tipo</h3>
+          <div id="typeButtons"></div>
+          <div class="nit-factura-fields">
+            <label>NIT</label>
+            <input
+              type="text"
+              id="nitInput"
+              placeholder="819003652"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="15"
+            />
+            <label>N° Factura</label>
+            <input
+              type="text"
+              id="facturaInput"
+              placeholder="CRE0010"
+              maxlength="10"
+            />
+            <button class="btn-generate" id="generarBtn">📦 Generar ZIP</button>
+            <button class="btn-clear" id="limpiarBtn">🗑️ Limpiar todo</button>
+          </div>
         </div>
 
-        <div class="main-grid">
-            <div class="types-panel">
-                <h3>📌 Asignar tipo</h3>
-                <div id="typeButtons"></div>
-                <div class="nit-factura-fields">
-                    <label>NIT</label>
-                    <input type="text" id="nitInput" placeholder="819003652" inputmode="numeric" pattern="[0-9]*"
-                        maxlength="15" />
-                    <label>N° Factura</label>
-                    <input type="text" id="facturaInput" placeholder="CRE0010" maxlength="10" />
-                    <button class="btn-generate" id="generarBtn">📦 Generar ZIP</button>
-                    <button class="btn-clear" id="limpiarBtn">🗑️ Limpiar todo</button>
-                </div>
+        <div class="right-panel">
+          <div class="viewer-container" id="viewerContainer">
+            <canvas id="viewerCanvas"></canvas>
+            <div class="no-pdf-msg" id="noPdfMsg">
+              Selecciona una página para visualizarla
             </div>
-
-            <div class="right-panel">
-                <div class="viewer-container" id="viewerContainer">
-                    <canvas id="viewerCanvas"></canvas>
-                    <div class="no-pdf-msg" id="noPdfMsg">
-                        Selecciona una página para visualizarla
-                    </div>
-                    <div class="viewer-controls" id="viewerControls" style="display: none">
-                        <span class="doc-name" id="viewerDocName"></span>
-                        <button id="prevPageBtn">◀</button>
-                        <span class="page-indicator">Pág. <span id="currentPageNum">1</span> /
-                            <span id="totalPagesNum">1</span></span>
-                        <button id="nextPageBtn">▶</button>
-                        <input type="number" id="goToPageInput" min="1" value="1" />
-                        <button id="goToPageBtn">Ir</button>
-                        <button class="zoom-btn" id="zoomOutBtn">−</button>
-                        <span id="zoomLevel" style="font-size: 0.8rem">100%</span>
-                        <button class="zoom-btn" id="zoomInBtn">+</button>
-                    </div>
-                </div>
-
-                <div class="gallery">
-                    <div class="gallery-header">
-                        <span class="title">📎 Páginas (vista unificada)</span>
-                        <div class="dropzone-small" id="dropzoneGallery">
-                            <span>➕ Agregar PDFs</span>
-                            <input type="file" id="fileInput" accept=".pdf" multiple />
-                        </div>
-                    </div>
-                    <div class="bulk-actions">
-                        <span style="font-size: 0.8rem; font-weight: 500">Asignar tipo a seleccionadas:</span>
-                        <select id="bulkTypeSelect">
-                            <option value="">-- Elegir --</option>
-                            <option value="HEV">
-                                Resumen De Atención U Hoja De Evolución(HEV)
-                            </option>
-                            <option value="EPI">Epicrisis(EPI)</option>
-                            <option value="PDX">
-                                Resultado De Los Procedimientos De Apoyo Diagnóstico(PDX)
-                            </option>
-                            <option value="DQX">Descripción quirurgica(DQX)</option>
-                            <option value="RAN">Registro de anestesia(RAN)</option>
-                            <option value="CRC">
-                                Comprobante de recibido del usuario(CRC)
-                            </option>
-                            <option value="TAP">
-                                Traslado asistencial de pacientes(TAP)
-                            </option>
-                            <option value="TNA">
-                                Transporte no asistencial ambulatorio de la persona(TNA)
-                            </option>
-                            <option value="FEV">Factura de venta(FEV)</option>
-                            <option value="FMO">
-                                Factura de venta de materiales de osteosistesis(FMO)
-                            </option>
-                            <option value="OPF">
-                                Orden o prescripción facultativa(OPF)
-                            </option>
-                            <option value="LDP">Lista de precios(LDP)</option>
-                            <option value="HAU">Hoja de atención de urgencias(HAU)</option>
-                            <option value="HAO">Hoja de anteción ondontológica(HAO)</option>
-                            <option value="HAM">Hoja de admon medicamentos(HAM)</option>
-                        </select>
-                        <button class="btn btn-primary" id="applyBulkTypeBtn">
-                            Aplicar
-                        </button>
-                        <button class="btn btn-outline" id="clearSelectionsBtn">
-                            Limpiar selección
-                        </button>
-                    </div>
-                    <div class="thumbnails" id="thumbnailsContainer"></div>
-                    <div class="gallery-footer">
-                        <span id="totalDocs">0 páginas</span>
-                        <span id="assignedStats">0 asignadas</span>
-                    </div>
-                </div>
+            <div
+              class="viewer-controls"
+              id="viewerControls"
+              style="display: none"
+            >
+              <span class="doc-name" id="viewerDocName"></span>
+              <button id="prevPageBtn">◀</button>
+              <span class="page-indicator"
+                >Pág. <span id="currentPageNum">1</span> /
+                <span id="totalPagesNum">1</span></span
+              >
+              <button id="nextPageBtn">▶</button>
+              <input type="number" id="goToPageInput" min="1" value="1" />
+              <button id="goToPageBtn">Ir</button>
+              <button class="zoom-btn" id="zoomOutBtn">−</button>
+              <span id="zoomLevel" style="font-size: 0.8rem">100%</span>
+              <button class="zoom-btn" id="zoomInBtn">+</button>
             </div>
+          </div>
+
+          <div class="gallery">
+            <div class="gallery-header">
+              <span class="title">📎 Páginas (vista unificada)</span>
+              <div class="dropzone-small" id="dropzoneGallery">
+                <span>➕ Agregar PDFs</span>
+                <input type="file" id="fileInput" accept=".pdf" multiple />
+              </div>
+            </div>
+            <div class="bulk-actions">
+              <span style="font-size: 0.8rem; font-weight: 500"
+                >Asignar tipo a seleccionadas:</span
+              >
+              <select id="bulkTypeSelect">
+                <option value="">-- Elegir --</option>
+                <option value="HEV">
+                  Resumen De Atención U Hoja De Evolución(HEV)
+                </option>
+                <option value="EPI">Epicrisis(EPI)</option>
+                <option value="PDX">
+                  Resultado De Los Procedimientos De Apoyo Diagnóstico(PDX)
+                </option>
+                <option value="DQX">Descripción quirurgica(DQX)</option>
+                <option value="RAN">Registro de anestesia(RAN)</option>
+                <option value="CRC">
+                  Comprobante de recibido del usuario(CRC)
+                </option>
+                <option value="TAP">
+                  Traslado asistencial de pacientes(TAP)
+                </option>
+                <option value="TNA">
+                  Transporte no asistencial ambulatorio de la persona(TNA)
+                </option>
+                <option value="FEV">Factura de venta(FEV)</option>
+                <option value="FMO">
+                  Factura de venta de materiales de osteosistesis(FMO)
+                </option>
+                <option value="OPF">
+                  Orden o prescripción facultativa(OPF)
+                </option>
+                <option value="LDP">Lista de precios(LDP)</option>
+                <option value="HAU">Hoja de atención de urgencias(HAU)</option>
+                <option value="HAO">Hoja de anteción ondontológica(HAO)</option>
+                <option value="HAM">Hoja de admon medicamentos(HAM)</option>
+              </select>
+              <button class="btn btn-primary" id="applyBulkTypeBtn">
+                Aplicar
+              </button>
+              <button class="btn btn-outline" id="clearSelectionsBtn">
+                Limpiar selección
+              </button>
+            </div>
+            <div class="thumbnails" id="thumbnailsContainer"></div>
+            <div class="gallery-footer">
+              <span id="totalDocs">0 páginas</span>
+              <span id="assignedStats">0 asignadas</span>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div class="footer" style="
+      <div
+        class="footer"
+        style="
           margin-top: 1.5rem;
           border-top: 1px solid #e9edf4;
           padding-top: 0.8rem;
           font-size: 0.75rem;
           color: #7a8fa6;
           text-align: center;
-        ">
-            Herramienta de tipificación.Ministerio de Salud Colombia
-        </div>
+        "
+      >
+        Herramienta de tipificación· Ministerio de Salud Colombia
+        <div
+          id="prestadorInfo"
+          style="
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #0b3b5c;
+            font-weight: 600;
+            min-height: 1.1em;
+            transition: all 0.25s ease;
+          "
+        ></div>
+      </div>
     </div>
     <!-- ========= OVERLAY DE CARGA ZIP ========= -->
     <div id="zipLoader" class="zip-loader-overlay">
-        <div class="zip-loader-card">
-            <!-- Spinner animado -->
-            <div class="zip-spinner">
-                <svg viewBox="0 0 50 50">
-                    <circle class="zip-spinner-track" cx="25" cy="25" r="20"></circle>
-                    <circle class="zip-spinner-head" cx="25" cy="25" r="20"></circle>
-                </svg>
-                <div class="zip-spinner-icon">📦</div>
-            </div>
-
-            <h3 id="zipLoaderTitle">Generando ZIP…</h3>
-            <p id="zipLoaderMessage">Preparando documentos…</p>
-
-            <!-- Barra de progreso -->
-            <div class="zip-progress">
-                <div class="zip-progress-bar" id="zipProgressBar"></div>
-            </div>
-            <div class="zip-progress-text">
-                <span id="zipProgressPct">0%</span>
-                <span id="zipProgressStep">Iniciando…</span>
-            </div>
+      <div class="zip-loader-card">
+        <!-- Spinner animado -->
+        <div class="zip-spinner">
+          <svg viewBox="0 0 50 50">
+            <circle class="zip-spinner-track" cx="25" cy="25" r="20"></circle>
+            <circle class="zip-spinner-head" cx="25" cy="25" r="20"></circle>
+          </svg>
+          <div class="zip-spinner-icon">📦</div>
         </div>
+
+        <h3 id="zipLoaderTitle">Generando ZIP…</h3>
+        <p id="zipLoaderMessage">Preparando documentos…</p>
+
+        <!-- Barra de progreso -->
+        <div class="zip-progress">
+          <div class="zip-progress-bar" id="zipProgressBar"></div>
+        </div>
+        <div class="zip-progress-text">
+          <span id="zipProgressPct">0%</span>
+          <span id="zipProgressStep">Iniciando…</span>
+        </div>
+      </div>
     </div>
     <div id="toast" class="toast"></div>
     <!-- ========= MODAL DE CONFIRMACIÓN ========= -->
     <div id="confirmModal" class="modal-confirm-overlay">
-        <div class="modal-confirm">
-            <div class="modal-icon">⚠️</div>
-            <h3 id="confirmTitle">¿Confirmar?</h3>
-            <p id="confirmMessage">...</p>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" id="confirmCancel">
-                    Cancelar
-                </button>
-                <button type="button" class="btn-confirm" id="confirmOk">
-                    Confirmar
-                </button>
-            </div>
+      <div class="modal-confirm">
+        <div class="modal-icon">⚠️</div>
+        <h3 id="confirmTitle">¿Confirmar?</h3>
+        <p id="confirmMessage">...</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="confirmCancel">
+            Cancelar
+          </button>
+          <button type="button" class="btn-confirm" id="confirmOk">
+            Confirmar
+          </button>
         </div>
+      </div>
     </div>
     <script>
-        /* ================================================================
+      /* ================================================================
              LOGIN · Gestión de autenticación con archivo plano usuarios.json
              ================================================================ */
-        const AUTH = (function () {
-            // Fallback embebido: se usa si NO se puede leer usuarios.json
-            // (por ejemplo si abres el index.html con doble clic y el
-            //  navegador bloquea fetch() por CORS en file://)
-            const USUARIOS_FALLBACK = [
-                {usuario: "admin", password: "admin123", nombre: "Administrador"},
-                {
-                    usuario: "facturacion",
-                    password: "fact2024",
-                    nombre: "Área de Facturación",
-                },
-                {
-                    usuario: "auditor",
-                    password: "audit2024",
-                    nombre: "Auditoría Interna",
-                },
-            ];
+      const AUTH = (function () {
+        // Fallback embebido: se usa si NO se puede leer usuarios.json
+        // (por ejemplo si abres el index.html con doble clic y el
+        //  navegador bloquea fetch() por CORS en file://)
+        const USUARIOS_FALLBACK = [
+          { usuario: "admin", password: "admin123", nombre: "Administrador" },
+          {
+            usuario: "facturacion",
+            password: "fact2024",
+            nombre: "Área de Facturación",
+          },
+          {
+            usuario: "auditor",
+            password: "audit2024",
+            nombre: "Auditoría Interna",
+          },
+        ];
 
-            const SESSION_KEY = "tipif2284_user";
+        const SESSION_KEY = "tipif2284_user";
 
-            async function cargarUsuarios() {
-                try {
-                    const res = await fetch("usuarios.json", {cache: "no-store"});
-                    if (!res.ok) throw new Error("HTTP " + res.status);
-                    const data = await res.json();
-                    if (Array.isArray(data.usuarios) && data.usuarios.length) {
-                        return data.usuarios;
-                    }
-                    throw new Error("Formato inválido");
-                } catch (e) {
-                    console.warn(
-                        "[AUTH] No se pudo leer usuarios.json → usando lista embebida.",
-                        e,
-                    );
-                    return USUARIOS_FALLBACK;
-                }
+        async function cargarUsuarios() {
+          try {
+            const res = await fetch("usuarios.json", { cache: "no-store" });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            const data = await res.json();
+            if (Array.isArray(data.usuarios) && data.usuarios.length) {
+              return data.usuarios;
+            }
+            throw new Error("Formato inválido");
+          } catch (e) {
+            console.warn(
+              "[AUTH] No se pudo leer usuarios.json → usando lista embebida.",
+              e,
+            );
+            return USUARIOS_FALLBACK;
+          }
+        }
+
+        function validar(usuario, password, lista) {
+          return (
+            lista.find(
+              (u) =>
+                u.usuario.toLowerCase() ===
+                  String(usuario).trim().toLowerCase() &&
+                u.password === String(password),
+            ) || null
+          );
+        }
+
+        function guardarSesion(user) {
+          try {
+            sessionStorage.setItem(
+              SESSION_KEY,
+              JSON.stringify({
+                usuario: user.usuario,
+                nombre: user.nombre,
+                ts: Date.now(),
+              }),
+            );
+          } catch (e) {
+            /* noop */
+          }
+        }
+
+        function obtenerSesion() {
+          try {
+            const raw = sessionStorage.getItem(SESSION_KEY);
+            return raw ? JSON.parse(raw) : null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function cerrarSesion() {
+          try {
+            sessionStorage.removeItem(SESSION_KEY);
+          } catch (e) {}
+        }
+
+        return {
+          cargarUsuarios,
+          validar,
+          guardarSesion,
+          obtenerSesion,
+          cerrarSesion,
+        };
+      })();
+
+      // Inicialización del login ANTES de montar la app
+      (async function initLogin() {
+        const overlay = document.getElementById("loginOverlay");
+        const appCont = document.getElementById("appContainer");
+        const form = document.getElementById("loginForm");
+        const userInput = document.getElementById("loginUser");
+        const passInput = document.getElementById("loginPass");
+        const errorEl = document.getElementById("loginError");
+        const loginBtn = document.getElementById("loginBtn");
+        const userChip = document.getElementById("userChip");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        const usuarios = await AUTH.cargarUsuarios();
+
+        function mostrarApp(sesion) {
+          overlay.classList.add("hidden");
+          appCont.style.display = "block";
+          if (sesion)
+            userChip.textContent = "👤 " + (sesion.nombre || sesion.usuario);
+          // Dispara el evento para que el script principal sepa que ya puede inicializar (si hace falta)
+          document.dispatchEvent(
+            new CustomEvent("auth:ok", { detail: sesion }),
+          );
+        }
+        function pedirConfirmacion({
+          titulo,
+          mensaje,
+          textoOk = "Confirmar",
+          icono = "⚠️",
+        }) {
+          return new Promise((resolve) => {
+            const overlay = document.getElementById("confirmModal");
+            const titleEl = document.getElementById("confirmTitle");
+            const msgEl = document.getElementById("confirmMessage");
+            const okBtn = document.getElementById("confirmOk");
+            const cancelBtn = document.getElementById("confirmCancel");
+            const iconEl = overlay.querySelector(".modal-icon");
+
+            titleEl.textContent = titulo;
+            msgEl.textContent = mensaje;
+            okBtn.textContent = textoOk;
+            iconEl.textContent = icono;
+
+            // Clonar para limpiar listeners previos
+            const nuevoOk = okBtn.cloneNode(true);
+            const nuevoCancel = cancelBtn.cloneNode(true);
+            okBtn.replaceWith(nuevoOk);
+            cancelBtn.replaceWith(nuevoCancel);
+
+            function cerrar(resultado) {
+              overlay.classList.remove("show");
+              setTimeout(() => resolve(resultado), 200);
             }
 
-            function validar(usuario, password, lista) {
-                return (
-                    lista.find(
-                        (u) =>
-                            u.usuario.toLowerCase() ===
-                            String(usuario).trim().toLowerCase() &&
-                            u.password === String(password),
-                    ) || null
-                );
-            }
+            nuevoOk.addEventListener("click", () => cerrar(true));
+            nuevoCancel.addEventListener("click", () => cerrar(false));
+            overlay.addEventListener("click", (e) => {
+              if (e.target === overlay) cerrar(false);
+            });
 
-            function guardarSesion(user) {
-                try {
-                    sessionStorage.setItem(
-                        SESSION_KEY,
-                        JSON.stringify({
-                            usuario: user.usuario,
-                            nombre: user.nombre,
-                            ts: Date.now(),
-                        }),
-                    );
-                } catch (e) {
-                    /* noop */
-                }
-            }
+            overlay.classList.add("show");
+            setTimeout(() => nuevoOk.focus(), 250);
+          });
+        }
+        function mostrarLogin() {
+          overlay.classList.remove("hidden");
+          appCont.style.display = "none";
+          passInput.value = "";
+          errorEl.textContent = "";
+          errorEl.classList.remove("show");
+          document.querySelector(".login-card").classList.remove("shake");
+          loginBtn.disabled = false;
+          loginBtn.classList.remove("loading");
+          userInput.focus();
+        }
 
-            function obtenerSesion() {
-                try {
-                    const raw = sessionStorage.getItem(SESSION_KEY);
-                    return raw ? JSON.parse(raw) : null;
-                } catch (e) {
-                    return null;
-                }
-            }
+        // ¿Ya hay sesión activa?
+        const sesionExistente = AUTH.obtenerSesion();
+        if (sesionExistente) {
+          mostrarApp(sesionExistente);
+        } else {
+          mostrarLogin();
+        }
 
-            function cerrarSesion() {
-                try {
-                    sessionStorage.removeItem(SESSION_KEY);
-                } catch (e) { }
-            }
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const card = document.querySelector(".login-card");
+          errorEl.textContent = "";
+          errorEl.classList.remove("show");
 
-            return {
-                cargarUsuarios,
-                validar,
-                guardarSesion,
-                obtenerSesion,
-                cerrarSesion,
-            };
-        })();
+          const u = userInput.value.trim();
+          const p = passInput.value;
 
-        // Inicialización del login ANTES de montar la app
-        (async function initLogin() {
-            const overlay = document.getElementById("loginOverlay");
-            const appCont = document.getElementById("appContainer");
-            const form = document.getElementById("loginForm");
-            const userInput = document.getElementById("loginUser");
-            const passInput = document.getElementById("loginPass");
-            const errorEl = document.getElementById("loginError");
-            const loginBtn = document.getElementById("loginBtn");
-            const userChip = document.getElementById("userChip");
-            const logoutBtn = document.getElementById("logoutBtn");
+          if (!u || !p) {
+            errorEl.textContent = "Completa usuario y contraseña.";
+            errorEl.classList.add("show");
+            card.classList.add("shake");
+            setTimeout(() => card.classList.remove("shake"), 500);
+            return;
+          }
 
-            const usuarios = await AUTH.cargarUsuarios();
+          loginBtn.disabled = true;
+          loginBtn.classList.add("loading");
 
-            function mostrarApp(sesion) {
-                overlay.classList.add("hidden");
-                appCont.style.display = "block";
-                if (sesion)
-                    userChip.textContent = "👤 " + (sesion.nombre || sesion.usuario);
-                // Dispara el evento para que el script principal sepa que ya puede inicializar (si hace falta)
-                document.dispatchEvent(
-                    new CustomEvent("auth:ok", {detail: sesion}),
-                );
-            }
-            function pedirConfirmacion({
-                titulo,
-                mensaje,
-                textoOk = "Confirmar",
-                icono = "⚠️",
-            }) {
-                return new Promise((resolve) => {
-                    const overlay = document.getElementById("confirmModal");
-                    const titleEl = document.getElementById("confirmTitle");
-                    const msgEl = document.getElementById("confirmMessage");
-                    const okBtn = document.getElementById("confirmOk");
-                    const cancelBtn = document.getElementById("confirmCancel");
-                    const iconEl = overlay.querySelector(".modal-icon");
-
-                    titleEl.textContent = titulo;
-                    msgEl.textContent = mensaje;
-                    okBtn.textContent = textoOk;
-                    iconEl.textContent = icono;
-
-                    // Clonar para limpiar listeners previos
-                    const nuevoOk = okBtn.cloneNode(true);
-                    const nuevoCancel = cancelBtn.cloneNode(true);
-                    okBtn.replaceWith(nuevoOk);
-                    cancelBtn.replaceWith(nuevoCancel);
-
-                    function cerrar(resultado) {
-                        overlay.classList.remove("show");
-                        setTimeout(() => resolve(resultado), 200);
-                    }
-
-                    nuevoOk.addEventListener("click", () => cerrar(true));
-                    nuevoCancel.addEventListener("click", () => cerrar(false));
-                    overlay.addEventListener("click", (e) => {
-                        if (e.target === overlay) cerrar(false);
-                    });
-
-                    overlay.classList.add("show");
-                    setTimeout(() => nuevoOk.focus(), 250);
-                });
-            }
-            function mostrarLogin() {
-                overlay.classList.remove("hidden");
-                appCont.style.display = "none";
-                passInput.value = "";
-                errorEl.textContent = "";
-                errorEl.classList.remove("show");
-                document.querySelector(".login-card").classList.remove("shake");
-                loginBtn.disabled = false;
-                loginBtn.classList.remove("loading");
-                userInput.focus();
-            }
-
-            // ¿Ya hay sesión activa?
-            const sesionExistente = AUTH.obtenerSesion();
-            if (sesionExistente) {
-                mostrarApp(sesionExistente);
+          setTimeout(() => {
+            const user = AUTH.validar(u, p, usuarios);
+            if (user) {
+              AUTH.guardarSesion(user);
+              mostrarApp({ usuario: user.usuario, nombre: user.nombre });
             } else {
-                mostrarLogin();
+              errorEl.textContent = "Usuario o contraseña incorrectos.";
+              errorEl.classList.add("show");
+              card.classList.add("shake");
+              setTimeout(() => card.classList.remove("shake"), 500);
+              passInput.value = "";
+              passInput.focus();
             }
+            loginBtn.disabled = false;
+            loginBtn.classList.remove("loading");
+          }, 400);
+        });
 
-            form.addEventListener("submit", (e) => {
-                e.preventDefault();
-                const card = document.querySelector(".login-card");
-                errorEl.textContent = "";
-                errorEl.classList.remove("show");
+        // ----- Helper reutilizable para pedir confirmación -----
+        // ================== HELPER GLOBAL ==================
 
-                const u = userInput.value.trim();
-                const p = passInput.value;
+        // ----- Logout con modal elegante -----
+        logoutBtn.addEventListener("click", async () => {
+          const ok = await pedirConfirmacion({
+            titulo: "¿Cerrar sesión?",
+            mensaje: "Tu sesión se cerrará y volverás a la pantalla de inicio.",
+            textoOk: "Sí, cerrar sesión",
+            icono: "🚪",
+          });
+          if (!ok) return;
 
-                if (!u || !p) {
-                    errorEl.textContent = "Completa usuario y contraseña.";
-                    errorEl.classList.add("show");
-                    card.classList.add("shake");
-                    setTimeout(() => card.classList.remove("shake"), 500);
-                    return;
-                }
-
-                loginBtn.disabled = true;
-                loginBtn.classList.add("loading");
-
-                setTimeout(() => {
-                    const user = AUTH.validar(u, p, usuarios);
-                    if (user) {
-                        AUTH.guardarSesion(user);
-                        mostrarApp({usuario: user.usuario, nombre: user.nombre});
-                    } else {
-                        errorEl.textContent = "Usuario o contraseña incorrectos.";
-                        errorEl.classList.add("show");
-                        card.classList.add("shake");
-                        setTimeout(() => card.classList.remove("shake"), 500);
-                        passInput.value = "";
-                        passInput.focus();
-                    }
-                    loginBtn.disabled = false;
-                    loginBtn.classList.remove("loading");
-                }, 400);
-            });
-
-            // ----- Helper reutilizable para pedir confirmación -----
-            // ================== HELPER GLOBAL ==================
-
-            // ----- Logout con modal elegante -----
-            logoutBtn.addEventListener("click", async () => {
-                const ok = await pedirConfirmacion({
-                    titulo: "¿Cerrar sesión?",
-                    mensaje: "Tu sesión se cerrará y volverás a la pantalla de inicio.",
-                    textoOk: "Sí, cerrar sesión",
-                    icono: "🚪",
-                });
-                if (!ok) return;
-
-                AUTH.cerrarSesion();
-                userInput.value = "";
-                mostrarLogin();
-            });
-        })();
-        /* ================================================================ */
+          AUTH.cerrarSesion();
+          userInput.value = "";
+          mostrarLogin();
+        });
+      })();
+      /* ================================================================ */
     </script>
 
     <script>
-        (function () {
-            const TYPE_COLORS = {
-                HEV: "#e74c3c",
-                EPI: "#3498db",
-                PDX: "#2ecc71",
-                DQX: "#f39c12",
-                RAN: "#9b59b6",
-                CRC: "#1abc9c",
-                TAP: "#e67e22",
-                TNA: "#2c3e50",
-                FEV: "#e84393",
-                FMO: "#00b894",
-                OPF: "#6c5ce7",
-                LDP: "#fd79a8",
-                HAU: "#00cec9",
-                HAO: "#fdcb6e",
-                HAM: "#a29bfe",
-            };
+      (function () {
+        const TYPE_COLORS = {
+          HEV: "#e74c3c",
+          EPI: "#3498db",
+          PDX: "#2ecc71",
+          DQX: "#f39c12",
+          RAN: "#9b59b6",
+          CRC: "#1abc9c",
+          TAP: "#e67e22",
+          TNA: "#2c3e50",
+          FEV: "#e84393",
+          FMO: "#00b894",
+          OPF: "#6c5ce7",
+          LDP: "#fd79a8",
+          HAU: "#00cec9",
+          HAO: "#fdcb6e",
+          HAM: "#a29bfe",
+        };
 
-            const TIPOS = [
-                "HEV",
-                "EPI",
-                "PDX",
-                "DQX",
-                "RAN",
-                "CRC",
-                "TAP",
-                "TNA",
-                "FEV",
-                "FMO",
-                "OPF",
-                "LDP",
-                "HAU",
-                "HAO",
-                "HAM",
-            ];
+        const TIPOS = [
+          "HEV",
+          "EPI",
+          "PDX",
+          "DQX",
+          "RAN",
+          "CRC",
+          "TAP",
+          "TNA",
+          "FEV",
+          "FMO",
+          "OPF",
+          "LDP",
+          "HAU",
+          "HAO",
+          "HAM",
+        ];
 
-            let pages = [];
-            let selectedPageId = null;
-            let currentPageId = null;
-            let nextId = 1;
-            let zoomScale = 1.0;
+        let pages = [];
+        let selectedPageId = null;
+        let currentPageId = null;
+        let nextId = 1;
+        let zoomScale = 1.0;
 
-            const typeButtonsDiv = document.getElementById("typeButtons");
-            const viewerCanvas = document.getElementById("viewerCanvas");
-            const ctx = viewerCanvas.getContext("2d");
-            const noPdfMsg = document.getElementById("noPdfMsg");
-            const viewerControls = document.getElementById("viewerControls");
-            const viewerDocName = document.getElementById("viewerDocName");
-            const currentPageNum = document.getElementById("currentPageNum");
-            const totalPagesNum = document.getElementById("totalPagesNum");
-            const prevPageBtn = document.getElementById("prevPageBtn");
-            const nextPageBtn = document.getElementById("nextPageBtn");
-            const goToPageInput = document.getElementById("goToPageInput");
-            const goToPageBtn = document.getElementById("goToPageBtn");
-            const zoomInBtn = document.getElementById("zoomInBtn");
-            const zoomOutBtn = document.getElementById("zoomOutBtn");
-            const zoomLevel = document.getElementById("zoomLevel");
-            const thumbnailsContainer = document.getElementById(
-                "thumbnailsContainer",
-            );
-            const totalDocs = document.getElementById("totalDocs");
-            const assignedStats = document.getElementById("assignedStats");
-            const dropzoneGallery = document.getElementById("dropzoneGallery");
-            const fileInput = document.getElementById("fileInput");
-            const nitInput = document.getElementById("nitInput");
-            const facturaInput = document.getElementById("facturaInput");
-            const generarBtn = document.getElementById("generarBtn");
-            const limpiarBtn = document.getElementById("limpiarBtn");
-            const bulkTypeSelect = document.getElementById("bulkTypeSelect");
-            const applyBulkTypeBtn = document.getElementById("applyBulkTypeBtn");
-            const clearSelectionsBtn =
-                document.getElementById("clearSelectionsBtn");
-            const toastEl = document.getElementById("toast");
+        const typeButtonsDiv = document.getElementById("typeButtons");
+        const viewerCanvas = document.getElementById("viewerCanvas");
+        const ctx = viewerCanvas.getContext("2d");
+        const noPdfMsg = document.getElementById("noPdfMsg");
+        const viewerControls = document.getElementById("viewerControls");
+        const viewerDocName = document.getElementById("viewerDocName");
+        const currentPageNum = document.getElementById("currentPageNum");
+        const totalPagesNum = document.getElementById("totalPagesNum");
+        const prevPageBtn = document.getElementById("prevPageBtn");
+        const nextPageBtn = document.getElementById("nextPageBtn");
+        const goToPageInput = document.getElementById("goToPageInput");
+        const goToPageBtn = document.getElementById("goToPageBtn");
+        const zoomInBtn = document.getElementById("zoomInBtn");
+        const zoomOutBtn = document.getElementById("zoomOutBtn");
+        const zoomLevel = document.getElementById("zoomLevel");
+        const thumbnailsContainer = document.getElementById(
+          "thumbnailsContainer",
+        );
+        const totalDocs = document.getElementById("totalDocs");
+        const assignedStats = document.getElementById("assignedStats");
+        const dropzoneGallery = document.getElementById("dropzoneGallery");
+        const fileInput = document.getElementById("fileInput");
+        const nitInput = document.getElementById("nitInput");
+        const facturaInput = document.getElementById("facturaInput");
+        const generarBtn = document.getElementById("generarBtn");
+        const limpiarBtn = document.getElementById("limpiarBtn");
+        const bulkTypeSelect = document.getElementById("bulkTypeSelect");
+        const applyBulkTypeBtn = document.getElementById("applyBulkTypeBtn");
+        const clearSelectionsBtn =
+          document.getElementById("clearSelectionsBtn");
+        const toastEl = document.getElementById("toast");
 
-            function showToast(msg) {
-                toastEl.textContent = msg;
-                toastEl.classList.add("show");
-                clearTimeout(toastEl._timer);
-                toastEl._timer = setTimeout(
-                    () => toastEl.classList.remove("show"),
-                    3000,
-                );
-            }
+        function showToast(msg) {
+          toastEl.textContent = msg;
+          toastEl.classList.add("show");
+          clearTimeout(toastEl._timer);
+          toastEl._timer = setTimeout(
+            () => toastEl.classList.remove("show"),
+            3000,
+          );
+        }
 
-            function renderTypeButtons() {
-                const counts = {};
-                TIPOS.forEach((t) => (counts[t] = 0));
-                pages.forEach((p) => {
-                    if (p.tipo && counts[p.tipo] !== undefined) counts[p.tipo]++;
-                });
-                let html = "";
+        function renderTypeButtons() {
+          const counts = {};
+          TIPOS.forEach((t) => (counts[t] = 0));
+          pages.forEach((p) => {
+            if (p.tipo && counts[p.tipo] !== undefined) counts[p.tipo]++;
+          });
+          let html = "";
 
-                TIPOS.forEach((t) => {
-                    const count = counts[t] || 0;
-                    const color = TYPE_COLORS[t] || "#888";
-                    const hasItems = count > 0 ? "has-items" : "";
-                    html += `
+          TIPOS.forEach((t) => {
+            const count = counts[t] || 0;
+            const color = TYPE_COLORS[t] || "#888";
+            const hasItems = count > 0 ? "has-items" : "";
+            html += `
         <div class="type-btn ${hasItems}" style="--type-color:${color}; border-left-color:${hasItems ? color : "transparent"};" data-tipo="${t}">
             <span class="color-indicator" style="background-color:${color};"></span>
             <span class="type-code" style="color:#1f3a57;">${t}</span>
             <span class="count" data-count="${count}">${count}</span>
         </div>
     `;
-                });
-                typeButtonsDiv.innerHTML = html;
+          });
+          typeButtonsDiv.innerHTML = html;
+        }
+        function animarContadorCambiado(tipo) {
+          const btn = document.querySelector(
+            `.type-btn[data-tipo="${tipo}"] .count`,
+          );
+          if (!btn) return;
+          btn.classList.remove("pop");
+          // forzar reflow para reiniciar la animación
+          void btn.offsetWidth;
+          btn.classList.add("pop");
+          setTimeout(() => btn.classList.remove("pop"), 400);
+        }
+        function pedirConfirmacion({
+          titulo,
+          mensaje,
+          textoOk = "Confirmar",
+          icono = "⚠️",
+        }) {
+          return new Promise((resolve) => {
+            const overlay = document.getElementById("confirmModal");
+            const titleEl = document.getElementById("confirmTitle");
+            const msgEl = document.getElementById("confirmMessage");
+            const okBtn = document.getElementById("confirmOk");
+            const cancelBtn = document.getElementById("confirmCancel");
+            const iconEl = overlay.querySelector(".modal-icon");
+
+            titleEl.textContent = titulo;
+            msgEl.textContent = mensaje;
+            okBtn.textContent = textoOk;
+            iconEl.textContent = icono;
+
+            // Clonar para limpiar listeners previos
+            const nuevoOk = okBtn.cloneNode(true);
+            const nuevoCancel = cancelBtn.cloneNode(true);
+            okBtn.replaceWith(nuevoOk);
+            cancelBtn.replaceWith(nuevoCancel);
+
+            function cerrar(resultado) {
+              overlay.classList.remove("show");
+              setTimeout(() => resolve(resultado), 200);
             }
-            function animarContadorCambiado(tipo) {
-                const btn = document.querySelector(
-                    `.type-btn[data-tipo="${tipo}"] .count`,
+
+            nuevoOk.addEventListener("click", () => cerrar(true));
+            nuevoCancel.addEventListener("click", () => cerrar(false));
+            overlay.addEventListener("click", (e) => {
+              if (e.target === overlay) cerrar(false);
+            });
+
+            overlay.classList.add("show");
+            setTimeout(() => nuevoOk.focus(), 250);
+          });
+        }
+        async function renderThumbnails() {
+          thumbnailsContainer.innerHTML = "";
+          if (pages.length === 0) {
+            thumbnailsContainer.innerHTML =
+              '<div style="color:#8b9eb5; padding:0.3rem; width:100%; text-align:center; font-size:0.8rem;">No hay páginas cargadas.</div>';
+            return;
+          }
+          for (const page of pages) {
+            const thumbDiv = document.createElement("div");
+            thumbDiv.className =
+              "thumb-item" + (page.id === selectedPageId ? " selected" : "");
+            if (page.tipo) thumbDiv.classList.add("tipo-asignado");
+            thumbDiv.dataset.pageId = page.id;
+
+            const canvas = document.createElement("canvas");
+            canvas.className = "thumb-canvas";
+            thumbDiv.appendChild(canvas);
+
+            const label = document.createElement("div");
+            label.className = "thumb-label";
+            const shortName =
+              page.name.length > 10 ? page.name.substr(0, 8) + "…" : page.name;
+            label.textContent = `${shortName} (p.${page.pageNum})`;
+            thumbDiv.appendChild(label);
+
+            if (page.tipo) {
+              const badge = document.createElement("span");
+              badge.className = "thumb-badge";
+              badge.textContent = page.tipo;
+              badge.style.backgroundColor = TYPE_COLORS[page.tipo] || "#0b3b5c";
+              thumbDiv.appendChild(badge);
+            }
+
+            const removeBtn = document.createElement("button");
+            removeBtn.className = "thumb-remove";
+            removeBtn.textContent = "✕";
+            removeBtn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              const id = parseInt(thumbDiv.dataset.pageId, 10);
+              await removePage(id);
+            });
+            thumbDiv.appendChild(removeBtn);
+
+            const check = document.createElement("input");
+            check.type = "checkbox";
+            check.className = "thumb-check";
+            check.dataset.pageId = page.id;
+            thumbDiv.appendChild(check);
+
+            thumbDiv.addEventListener("click", (e) => {
+              if (e.target.tagName === "INPUT") return;
+              const id = parseInt(thumbDiv.dataset.pageId, 10);
+              selectPage(id);
+            });
+
+            thumbnailsContainer.appendChild(thumbDiv);
+
+            try {
+              if (page.pageObj) {
+                const viewport = page.pageObj.getViewport({ scale: 0.2 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                await page.pageObj.render({
+                  canvasContext: canvas.getContext("2d"),
+                  viewport,
+                }).promise;
+              }
+            } catch (err) {
+              console.warn("Error en miniatura para", page.name, err);
+            }
+          }
+          updateStats();
+        }
+
+        async function selectPage(id) {
+          selectedPageId = id;
+          const page = pages.find((p) => p.id === id);
+          if (!page) return;
+
+          document.querySelectorAll(".thumb-item").forEach((el) => {
+            el.classList.toggle(
+              "selected",
+              parseInt(el.dataset.pageId, 10) === id,
+            );
+          });
+
+          if (page.pageObj) {
+            noPdfMsg.style.display = "none";
+            viewerControls.style.display = "flex";
+            viewerDocName.textContent = `${page.name} (pág. ${page.pageNum} de ${page.totalPages})`;
+            totalPagesNum.textContent = page.totalPages;
+            currentPageId = id;
+            await renderViewerPage(page);
+          } else {
+            noPdfMsg.style.display = "block";
+            viewerControls.style.display = "none";
+            viewerCanvas.style.display = "none";
+          }
+        }
+
+        async function renderViewerPage(page) {
+          if (!page || !page.pageObj) return;
+          try {
+            const viewport = page.pageObj.getViewport({ scale: zoomScale });
+            viewerCanvas.width = viewport.width;
+            viewerCanvas.height = viewport.height;
+            viewerCanvas.style.display = "block";
+            ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
+            await page.pageObj.render({ canvasContext: ctx, viewport }).promise;
+            currentPageNum.textContent = page.pageNum;
+            goToPageInput.value = page.pageNum;
+            zoomLevel.textContent = Math.round(zoomScale * 100) + "%";
+          } catch (err) {
+            console.warn("Error renderizando página", err);
+          }
+        }
+
+        function navigatePages(delta) {
+          if (!currentPageId) return;
+          const currentPage = pages.find((p) => p.id === currentPageId);
+          if (!currentPage) return;
+          const docPages = pages
+            .filter((p) => p.docId === currentPage.docId)
+            .sort((a, b) => a.pageNum - b.pageNum);
+          const idx = docPages.findIndex((p) => p.id === currentPageId);
+          let newIdx = idx + delta;
+          if (newIdx < 0) newIdx = 0;
+          if (newIdx >= docPages.length) newIdx = docPages.length - 1;
+          if (newIdx !== idx) selectPage(docPages[newIdx].id);
+        }
+
+        function goToPageNum() {
+          if (!currentPageId) return;
+          const currentPage = pages.find((p) => p.id === currentPageId);
+          if (!currentPage) return;
+          let val = parseInt(goToPageInput.value, 10);
+          if (isNaN(val) || val < 1) val = 1;
+          const docPages = pages.filter((p) => p.docId === currentPage.docId);
+          if (val > docPages.length) val = docPages.length;
+          const target = docPages.find((p) => p.pageNum === val);
+          if (target) selectPage(target.id);
+        }
+
+        function changeZoom(delta) {
+          zoomScale = Math.min(3.0, Math.max(0.3, zoomScale + delta));
+          zoomLevel.textContent = Math.round(zoomScale * 100) + "%";
+          if (currentPageId) {
+            const page = pages.find((p) => p.id === currentPageId);
+            if (page) renderViewerPage(page);
+          }
+        }
+
+        // Eliminar una página específica (no todo el documento)
+        // Eliminar una página específica (no todo el documento)
+        async function removePage(id) {
+          const pageIndex = pages.findIndex((p) => p.id === id);
+          if (pageIndex === -1) return;
+
+          const page = pages[pageIndex];
+          const docId = page.docId;
+
+          // Si es la única página del documento, confirmar con modal elegante
+          const paginasDelDoc = pages.filter((p) => p.docId === docId);
+          if (paginasDelDoc.length === 1) {
+            const ok = await pedirConfirmacion({
+              titulo: "¿Eliminar documento?",
+              mensaje: `"${page.name}" solo tiene esta página. Si la eliminas, se quitará el documento completo del proceso.`,
+              textoOk: "Sí, eliminar",
+              icono: "🗑️",
+            });
+            if (!ok) return;
+          }
+
+          // Eliminar SOLO esa página
+          pages.splice(pageIndex, 1);
+
+          // Reajustar el número de página de las páginas restantes del mismo documento
+          const restantes = pages
+            .filter((p) => p.docId === docId)
+            .sort((a, b) => a.pageNum - b.pageNum);
+          restantes.forEach((p, i) => {
+            p.pageNum = i + 1;
+            p.totalPages = restantes.length;
+          });
+
+          // Si la página eliminada era la seleccionada o la actual, limpiar
+          if (selectedPageId === id) {
+            selectedPageId = null;
+            currentPageId = null;
+          }
+          if (currentPageId === id) {
+            currentPageId = null;
+          }
+
+          // Si quedan páginas, seleccionar la siguiente del mismo doc o la primera
+          if (pages.length > 0) {
+            const siguiente = restantes.length > 0 ? restantes[0] : pages[0];
+            selectedPageId = siguiente.id;
+          } else {
+            noPdfMsg.style.display = "block";
+            viewerControls.style.display = "none";
+            viewerCanvas.style.display = "none";
+          }
+
+          renderAll();
+          showToast(`🗑️ Página ${page.pageNum} eliminada.`);
+        }
+
+        function updateStats() {
+          totalDocs.textContent = `${pages.length} páginas`;
+          const assigned = pages.filter((p) => p.tipo).length;
+          assignedStats.textContent = `${assigned} asignadas`;
+        }
+
+        function applyBulkType() {
+          const tipo = bulkTypeSelect.value;
+          if (!tipo) {
+            showToast("Selecciona un tipo.");
+            return;
+          }
+          const checkboxes = document.querySelectorAll(".thumb-check:checked");
+          if (checkboxes.length === 0) {
+            showToast("Selecciona al menos una página.");
+            return;
+          }
+          let count = 0;
+          checkboxes.forEach((cb) => {
+            const id = parseInt(cb.dataset.pageId, 10);
+            const page = pages.find((p) => p.id === id);
+            if (page) {
+              page.tipo = tipo;
+              count++;
+            }
+          });
+          document
+            .querySelectorAll(".thumb-check")
+            .forEach((cb) => (cb.checked = false));
+          bulkTypeSelect.value = "";
+          bulkTypeSelect.classList.remove("reset-flash");
+          void bulkTypeSelect.offsetWidth; // truco para reiniciar la animación
+          bulkTypeSelect.classList.add("reset-flash");
+          setTimeout(() => bulkTypeSelect.classList.remove("reset-flash"), 650);
+          renderAll();
+          // animar el contador del tipo asignado
+          animarContadorCambiado(tipo);
+          showToast(`Tipo ${tipo} asignado a ${count} página(s).`);
+        }
+
+        function clearSelections() {
+          document
+            .querySelectorAll(".thumb-check")
+            .forEach((cb) => (cb.checked = false));
+          showToast("Selecciones limpiadas.");
+        }
+
+        function renderAll() {
+          renderTypeButtons();
+          renderThumbnails();
+          if (selectedPageId && pages.some((p) => p.id === selectedPageId)) {
+            const page = pages.find((p) => p.id === selectedPageId);
+            if (page) {
+              if (currentPageId !== selectedPageId) selectPage(selectedPageId);
+              else renderViewerPage(page);
+            }
+          } else if (pages.length > 0) {
+            selectPage(pages[0].id);
+          } else {
+            selectedPageId = null;
+            currentPageId = null;
+            noPdfMsg.style.display = "block";
+            viewerControls.style.display = "none";
+            viewerCanvas.style.display = "none";
+          }
+          updateStats();
+        }
+
+        async function loadFiles(files) {
+          let loaded = 0;
+          const fileArray = Array.from(files);
+          for (const file of fileArray) {
+            if (file.type !== "application/pdf") {
+              showToast(`"${file.name}" no es PDF, se omite.`);
+              continue;
+            }
+            try {
+              const arrayBuffer = await file.arrayBuffer();
+              const pdf = await pdfjsLib.getDocument({ data: arrayBuffer })
+                .promise;
+              const numPages = pdf.numPages;
+              const docId = nextId++;
+              for (let i = 1; i <= numPages; i++) {
+                const page = await pdf.getPage(i);
+                pages.push({
+                  id: nextId++,
+                  docId: docId,
+                  file: file,
+                  name: file.name,
+                  pageNum: i, // número visible (puede cambiar al borrar)
+                  realPageIndex: i - 1, // índice real en el PDF (NO cambia)
+                  totalPages: numPages,
+                  tipo: null,
+                  arrayBuffer: arrayBuffer,
+                  pdfDoc: pdf,
+                  pageObj: page,
+                });
+              }
+              loaded++;
+            } catch (err) {
+              showToast(`Error al cargar "${file.name}"`);
+              console.error(err);
+            }
+          }
+          if (loaded > 0) {
+            renderAll();
+            if (pages.length > 0) selectPage(pages[0].id);
+            showToast(
+              `${loaded} documento(s) cargado(s) (${pages.length} páginas).`,
+            );
+          } else if (fileArray.length > 0) {
+            showToast("No se pudo cargar ningún PDF.");
+          }
+        }
+
+        // ---- Helper para controlar el loader ----
+        function zipLoaderStart() {
+          const overlay = document.getElementById("zipLoader");
+          const card = overlay.querySelector(".zip-loader-card");
+          const title = document.getElementById("zipLoaderTitle");
+          const msg = document.getElementById("zipLoaderMessage");
+          const bar = document.getElementById("zipProgressBar");
+          const pct = document.getElementById("zipProgressPct");
+          const step = document.getElementById("zipProgressStep");
+
+          card.classList.remove("success");
+          title.textContent = "Generando ZIP…";
+          msg.textContent = "Preparando documentos…";
+          bar.style.width = "0%";
+          pct.textContent = "0%";
+          step.textContent = "Iniciando…";
+
+          overlay.classList.add("show");
+        }
+
+        function zipLoaderUpdate(percent, message) {
+          const bar = document.getElementById("zipProgressBar");
+          const pct = document.getElementById("zipProgressPct");
+          const step = document.getElementById("zipProgressStep");
+          const msg = document.getElementById("zipLoaderMessage");
+
+          const p = Math.max(0, Math.min(100, Math.round(percent)));
+          bar.style.width = p + "%";
+          pct.textContent = p + "%";
+          if (message) {
+            step.textContent = message;
+            msg.textContent = message;
+          }
+        }
+
+        function zipLoaderFinish(success, message) {
+          const overlay = document.getElementById("zipLoader");
+          const card = overlay.querySelector(".zip-loader-card");
+          const title = document.getElementById("zipLoaderTitle");
+          const msg = document.getElementById("zipLoaderMessage");
+          const step = document.getElementById("zipProgressStep");
+
+          if (success) {
+            card.classList.add("success");
+            document.querySelector("#zipLoader .zip-spinner-icon").textContent =
+              "✅";
+            title.textContent = "¡Listo!";
+            msg.textContent = message || "ZIP generado correctamente";
+            step.textContent = "Completado";
+            zipLoaderUpdate(100, "Completado");
+            setTimeout(() => {
+              overlay.classList.remove("show");
+              // resetear icono para la próxima vez
+              setTimeout(() => {
+                document.querySelector(
+                  "#zipLoader .zip-spinner-icon",
+                ).textContent = "📦";
+              }, 300);
+            }, 1400);
+          } else {
+            title.textContent = "Error";
+            msg.textContent = message || "No se pudo generar el ZIP";
+            setTimeout(() => overlay.classList.remove("show"), 1600);
+          }
+        }
+        // NIT: solo dígitos
+        nitInput.addEventListener("input", (e) => {
+          const limpio = e.target.value.replace(/\D/g, "");
+          if (e.target.value !== limpio) {
+            e.target.value = limpio;
+          }
+          e.target.classList.remove("input-error");
+        });
+        // Factura: quitar espacios y limpiar error al escribir
+        facturaInput.addEventListener("input", (e) => {
+          e.target.value = e.target.value.replace(/\s+/g, " ").trimStart();
+          e.target.classList.remove("input-error");
+        });
+        // ---- Función principal con progreso en tiempo real ----
+        async function generarZip() {
+          if (pages.length === 0) {
+            showToast("No hay páginas para procesar.");
+            return;
+          }
+
+          const nit = nitInput.value.trim();
+          const factura = facturaInput.value.trim();
+          // ---- VALIDACIONES ----
+          nitInput.classList.remove("input-error");
+          facturaInput.classList.remove("input-error");
+
+          if (!nit) {
+            nitInput.classList.add("input-error");
+            nitInput.focus();
+            showToast("⚠️ Ingresa el NIT antes de generar el ZIP.");
+            return;
+          }
+          if (!/^\d+$/.test(nit)) {
+            nitInput.classList.add("input-error");
+            nitInput.focus();
+            showToast("⚠️ El NIT solo debe contener números.");
+            return;
+          }
+          if (!factura) {
+            facturaInput.classList.add("input-error");
+            facturaInput.focus();
+            showToast(
+              "⚠️ Ingresa el número de factura antes de generar el ZIP.",
+            );
+            return;
+          }
+
+          const groups = {};
+          let unassigned = 0;
+          pages.forEach((p) => {
+            if (!p.tipo) {
+              unassigned++;
+              return;
+            }
+            if (!groups[p.tipo]) groups[p.tipo] = [];
+            groups[p.tipo].push(p);
+          });
+
+          if (Object.keys(groups).length === 0) {
+            showToast("Ninguna página tiene tipo asignado.");
+            return;
+          }
+
+          if (unassigned > 0) {
+            const ok = await pedirConfirmacion({
+              titulo: "Hay páginas sin asignar",
+              mensaje: `Hay ${unassigned} página(s) sin tipo asignado. ¿Deseas continuar de todas formas?`,
+              textoOk: "Sí, continuar",
+              icono: "⚠️",
+            });
+            if (!ok) return;
+          }
+
+          // 👇 Arranca la animación
+          zipLoaderStart();
+
+          try {
+            const zip = new JSZip();
+
+            // Calcular total de páginas para el progreso real
+            const totalPaginas = Object.values(groups).reduce(
+              (sum, arr) => sum + arr.length,
+              0,
+            );
+            let paginasProcesadas = 0;
+
+            const tipos = Object.keys(groups);
+            for (let i = 0; i < tipos.length; i++) {
+              const tipo = tipos[i];
+              const pagesList = groups[tipo];
+              pagesList.sort(
+                (a, b) => a.docId - b.docId || a.pageNum - b.pageNum,
+              );
+
+              zipLoaderUpdate(
+                (paginasProcesadas / totalPaginas) * 100,
+                `Procesando ${tipo}…`,
+              );
+
+              const mergedPdf = await PDFLib.PDFDocument.create();
+              const docCache = {};
+
+              for (const p of pagesList) {
+                if (!docCache[p.docId]) {
+                  try {
+                    const src = await PDFLib.PDFDocument.load(p.arrayBuffer, {
+                      ignoreEncryption: true,
+                    });
+                    docCache[p.docId] = src;
+                  } catch (err) {
+                    console.error(`No se pudo cargar ${p.name}:`, err);
+                    showToast(`⚠️ No se pudo procesar "${p.name}"`);
+                    continue;
+                  }
+                }
+                const srcDoc = docCache[p.docId];
+                const [copiedPage] = await mergedPdf.copyPages(srcDoc, [
+                  p.realPageIndex ?? p.pageNum - 1,
+                ]);
+                mergedPdf.addPage(copiedPage);
+              }
+
+              const bytes = await mergedPdf.save();
+              zip.file(`${tipo}_${nit}_${factura}.pdf`, bytes);
+
+              // Dar un respiro al navegador para que repinte la UI
+              await new Promise((r) => setTimeout(r, 30));
+            }
+
+            zipLoaderUpdate(98, "Comprimiendo archivos…");
+            const zipBlob = await zip.generateAsync(
+              { type: "blob" },
+              (meta) => {
+                // meta.percent va de 0 a 100 según JSZip
+                zipLoaderUpdate(
+                  98 + (meta.percent / 100) * 2,
+                  `Comprimiendo… ${Math.round(meta.percent)}%`,
                 );
-                if (!btn) return;
-                btn.classList.remove("pop");
-                // forzar reflow para reiniciar la animación
-                void btn.offsetWidth;
-                btn.classList.add("pop");
-                setTimeout(() => btn.classList.remove("pop"), 400);
+              },
+            );
+
+            saveAs(zipBlob, `${factura}.zip`);
+
+            zipLoaderFinish(
+              true,
+              `ZIP con ${tipos.length} archivo(s) generado.`,
+            );
+            // 🧹 Limpiar todo después de exportar
+            setTimeout(() => {
+              pages = [];
+              selectedPageId = null;
+              currentPageId = null;
+              zoomScale = 1.0;
+              bulkTypeSelect.value = "";
+              document
+                .querySelectorAll(".thumb-check")
+                .forEach((cb) => (cb.checked = false));
+              renderAll();
+              showToast("🧹 Listo para un nuevo proceso.");
+            }, 400);
+          } catch (err) {
+            console.error(err);
+            zipLoaderFinish(false, "Ocurrió un error al generar el ZIP.");
+          }
+        }
+        /* ================================================================
+     PRESTADORES · Carga de prestadores.json y búsqueda por NIT
+     ================================================================ */
+        const PRESTADORES = (function () {
+          let lista = [];
+          let cargado = false;
+
+          async function cargar() {
+            try {
+              const res = await fetch("prestadores.json", {
+                cache: "no-store",
+              });
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              const data = await res.json();
+              // El JSON es un array directo
+              if (Array.isArray(data)) {
+                lista = data;
+              } else if (Array.isArray(data.prestadores)) {
+                lista = data.prestadores;
+              } else {
+                throw new Error("Formato inválido");
+              }
+              // Normalizar NIT (quitar espacios, dejar solo dígitos)
+              lista.forEach((p) => {
+                p._nitLimpio = String(p.NIT || "").replace(/\D/g, "");
+              });
+              cargado = true;
+              console.log(
+                `[PRESTADORES] ${lista.length} prestadores cargados.`,
+              );
+              return true;
+            } catch (e) {
+              console.warn("[PRESTADORES] No se pudo leer prestadores.json", e);
+              lista = [];
+              cargado = false;
+              return false;
             }
-            function pedirConfirmacion({
-                titulo,
-                mensaje,
-                textoOk = "Confirmar",
-                icono = "⚠️",
-            }) {
-                return new Promise((resolve) => {
-                    const overlay = document.getElementById("confirmModal");
-                    const titleEl = document.getElementById("confirmTitle");
-                    const msgEl = document.getElementById("confirmMessage");
-                    const okBtn = document.getElementById("confirmOk");
-                    const cancelBtn = document.getElementById("confirmCancel");
-                    const iconEl = overlay.querySelector(".modal-icon");
-
-                    titleEl.textContent = titulo;
-                    msgEl.textContent = mensaje;
-                    okBtn.textContent = textoOk;
-                    iconEl.textContent = icono;
-
-                    // Clonar para limpiar listeners previos
-                    const nuevoOk = okBtn.cloneNode(true);
-                    const nuevoCancel = cancelBtn.cloneNode(true);
-                    okBtn.replaceWith(nuevoOk);
-                    cancelBtn.replaceWith(nuevoCancel);
-
-                    function cerrar(resultado) {
-                        overlay.classList.remove("show");
-                        setTimeout(() => resolve(resultado), 200);
-                    }
-
-                    nuevoOk.addEventListener("click", () => cerrar(true));
-                    nuevoCancel.addEventListener("click", () => cerrar(false));
-                    overlay.addEventListener("click", (e) => {
-                        if (e.target === overlay) cerrar(false);
-                    });
-
-                    overlay.classList.add("show");
-                    setTimeout(() => nuevoOk.focus(), 250);
-                });
-            }
-            async function renderThumbnails() {
-                thumbnailsContainer.innerHTML = "";
-                if (pages.length === 0) {
-                    thumbnailsContainer.innerHTML =
-                        '<div style="color:#8b9eb5; padding:0.3rem; width:100%; text-align:center; font-size:0.8rem;">No hay páginas cargadas.</div>';
-                    return;
-                }
-                for (const page of pages) {
-                    const thumbDiv = document.createElement("div");
-                    thumbDiv.className =
-                        "thumb-item" + (page.id === selectedPageId ? " selected" : "");
-                    if (page.tipo) thumbDiv.classList.add("tipo-asignado");
-                    thumbDiv.dataset.pageId = page.id;
-
-                    const canvas = document.createElement("canvas");
-                    canvas.className = "thumb-canvas";
-                    thumbDiv.appendChild(canvas);
-
-                    const label = document.createElement("div");
-                    label.className = "thumb-label";
-                    const shortName =
-                        page.name.length > 10 ? page.name.substr(0, 8) + "…" : page.name;
-                    label.textContent = `${shortName} (p.${page.pageNum})`;
-                    thumbDiv.appendChild(label);
-
-                    if (page.tipo) {
-                        const badge = document.createElement("span");
-                        badge.className = "thumb-badge";
-                        badge.textContent = page.tipo;
-                        badge.style.backgroundColor = TYPE_COLORS[page.tipo] || "#0b3b5c";
-                        thumbDiv.appendChild(badge);
-                    }
-
-                    const removeBtn = document.createElement("button");
-                    removeBtn.className = "thumb-remove";
-                    removeBtn.textContent = "✕";
-                    removeBtn.addEventListener("click", async (e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        const id = parseInt(thumbDiv.dataset.pageId, 10);
-                        await removePage(id);
-                    });
-                    thumbDiv.appendChild(removeBtn);
-
-                    const check = document.createElement("input");
-                    check.type = "checkbox";
-                    check.className = "thumb-check";
-                    check.dataset.pageId = page.id;
-                    thumbDiv.appendChild(check);
-
-                    thumbDiv.addEventListener("click", (e) => {
-                        if (e.target.tagName === "INPUT") return;
-                        const id = parseInt(thumbDiv.dataset.pageId, 10);
-                        selectPage(id);
-                    });
-
-                    thumbnailsContainer.appendChild(thumbDiv);
-
-                    try {
-                        if (page.pageObj) {
-                            const viewport = page.pageObj.getViewport({scale: 0.2});
-                            canvas.width = viewport.width;
-                            canvas.height = viewport.height;
-                            await page.pageObj.render({
-                                canvasContext: canvas.getContext("2d"),
-                                viewport,
-                            }).promise;
-                        }
-                    } catch (err) {
-                        console.warn("Error en miniatura para", page.name, err);
-                    }
-                }
-                updateStats();
-            }
-
-            async function selectPage(id) {
-                selectedPageId = id;
-                const page = pages.find((p) => p.id === id);
-                if (!page) return;
-
-                document.querySelectorAll(".thumb-item").forEach((el) => {
-                    el.classList.toggle(
-                        "selected",
-                        parseInt(el.dataset.pageId, 10) === id,
-                    );
-                });
-
-                if (page.pageObj) {
-                    noPdfMsg.style.display = "none";
-                    viewerControls.style.display = "flex";
-                    viewerDocName.textContent = `${page.name} (pág. ${page.pageNum} de ${page.totalPages})`;
-                    totalPagesNum.textContent = page.totalPages;
-                    currentPageId = id;
-                    await renderViewerPage(page);
-                } else {
-                    noPdfMsg.style.display = "block";
-                    viewerControls.style.display = "none";
-                    viewerCanvas.style.display = "none";
-                }
-            }
-
-            async function renderViewerPage(page) {
-                if (!page || !page.pageObj) return;
-                try {
-                    const viewport = page.pageObj.getViewport({scale: zoomScale});
-                    viewerCanvas.width = viewport.width;
-                    viewerCanvas.height = viewport.height;
-                    viewerCanvas.style.display = "block";
-                    ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
-                    await page.pageObj.render({canvasContext: ctx, viewport}).promise;
-                    currentPageNum.textContent = page.pageNum;
-                    goToPageInput.value = page.pageNum;
-                    zoomLevel.textContent = Math.round(zoomScale * 100) + "%";
-                } catch (err) {
-                    console.warn("Error renderizando página", err);
-                }
-            }
-
-            function navigatePages(delta) {
-                if (!currentPageId) return;
-                const currentPage = pages.find((p) => p.id === currentPageId);
-                if (!currentPage) return;
-                const docPages = pages
-                    .filter((p) => p.docId === currentPage.docId)
-                    .sort((a, b) => a.pageNum - b.pageNum);
-                const idx = docPages.findIndex((p) => p.id === currentPageId);
-                let newIdx = idx + delta;
-                if (newIdx < 0) newIdx = 0;
-                if (newIdx >= docPages.length) newIdx = docPages.length - 1;
-                if (newIdx !== idx) selectPage(docPages[newIdx].id);
-            }
-
-            function goToPageNum() {
-                if (!currentPageId) return;
-                const currentPage = pages.find((p) => p.id === currentPageId);
-                if (!currentPage) return;
-                let val = parseInt(goToPageInput.value, 10);
-                if (isNaN(val) || val < 1) val = 1;
-                const docPages = pages.filter((p) => p.docId === currentPage.docId);
-                if (val > docPages.length) val = docPages.length;
-                const target = docPages.find((p) => p.pageNum === val);
-                if (target) selectPage(target.id);
-            }
-
-            function changeZoom(delta) {
-                zoomScale = Math.min(3.0, Math.max(0.3, zoomScale + delta));
-                zoomLevel.textContent = Math.round(zoomScale * 100) + "%";
-                if (currentPageId) {
-                    const page = pages.find((p) => p.id === currentPageId);
-                    if (page) renderViewerPage(page);
-                }
-            }
-
-            // Eliminar una página específica (no todo el documento)
-            // Eliminar una página específica (no todo el documento)
-            async function removePage(id) {
-                const pageIndex = pages.findIndex((p) => p.id === id);
-                if (pageIndex === -1) return;
-
-                const page = pages[pageIndex];
-                const docId = page.docId;
-
-                // Si es la única página del documento, confirmar con modal elegante
-                const paginasDelDoc = pages.filter((p) => p.docId === docId);
-                if (paginasDelDoc.length === 1) {
-                    const ok = await pedirConfirmacion({
-                        titulo: "¿Eliminar documento?",
-                        mensaje: `"${page.name}" solo tiene esta página. Si la eliminas, se quitará el documento completo del proceso.`,
-                        textoOk: "Sí, eliminar",
-                        icono: "🗑️",
-                    });
-                    if (!ok) return;
-                }
-
-                // Eliminar SOLO esa página
-                pages.splice(pageIndex, 1);
-
-                // Reajustar el número de página de las páginas restantes del mismo documento
-                const restantes = pages
-                    .filter((p) => p.docId === docId)
-                    .sort((a, b) => a.pageNum - b.pageNum);
-                restantes.forEach((p, i) => {
-                    p.pageNum = i + 1;
-                    p.totalPages = restantes.length;
-                });
-
-                // Si la página eliminada era la seleccionada o la actual, limpiar
-                if (selectedPageId === id) {
-                    selectedPageId = null;
-                    currentPageId = null;
-                }
-                if (currentPageId === id) {
-                    currentPageId = null;
-                }
-
-                // Si quedan páginas, seleccionar la siguiente del mismo doc o la primera
-                if (pages.length > 0) {
-                    const siguiente = restantes.length > 0 ? restantes[0] : pages[0];
-                    selectedPageId = siguiente.id;
-                } else {
-                    noPdfMsg.style.display = "block";
-                    viewerControls.style.display = "none";
-                    viewerCanvas.style.display = "none";
-                }
-
-                renderAll();
-                showToast(`🗑️ Página ${page.pageNum} eliminada.`);
-            }
-
-            function updateStats() {
-                totalDocs.textContent = `${pages.length} páginas`;
-                const assigned = pages.filter((p) => p.tipo).length;
-                assignedStats.textContent = `${assigned} asignadas`;
-            }
-
-            function applyBulkType() {
-                const tipo = bulkTypeSelect.value;
-                if (!tipo) {
-                    showToast("Selecciona un tipo.");
-                    return;
-                }
-                const checkboxes = document.querySelectorAll(".thumb-check:checked");
-                if (checkboxes.length === 0) {
-                    showToast("Selecciona al menos una página.");
-                    return;
-                }
-                let count = 0;
-                checkboxes.forEach((cb) => {
-                    const id = parseInt(cb.dataset.pageId, 10);
-                    const page = pages.find((p) => p.id === id);
-                    if (page) {
-                        page.tipo = tipo;
-                        count++;
-                    }
-                });
-                document
-                    .querySelectorAll(".thumb-check")
-                    .forEach((cb) => (cb.checked = false));
-                bulkTypeSelect.value = "";
-                bulkTypeSelect.classList.remove("reset-flash");
-                void bulkTypeSelect.offsetWidth; // truco para reiniciar la animación
-                bulkTypeSelect.classList.add("reset-flash");
-                setTimeout(() => bulkTypeSelect.classList.remove("reset-flash"), 650);
-                renderAll();
-                // animar el contador del tipo asignado
-                animarContadorCambiado(tipo);
-                showToast(`Tipo ${tipo} asignado a ${count} página(s).`);
-            }
-
-            function clearSelections() {
-                document
-                    .querySelectorAll(".thumb-check")
-                    .forEach((cb) => (cb.checked = false));
-                showToast("Selecciones limpiadas.");
-            }
-
-            function renderAll() {
-                renderTypeButtons();
-                renderThumbnails();
-                if (selectedPageId && pages.some((p) => p.id === selectedPageId)) {
-                    const page = pages.find((p) => p.id === selectedPageId);
-                    if (page) {
-                        if (currentPageId !== selectedPageId) selectPage(selectedPageId);
-                        else renderViewerPage(page);
-                    }
-                } else if (pages.length > 0) {
-                    selectPage(pages[0].id);
-                } else {
-                    selectedPageId = null;
-                    currentPageId = null;
-                    noPdfMsg.style.display = "block";
-                    viewerControls.style.display = "none";
-                    viewerCanvas.style.display = "none";
-                }
-                updateStats();
-            }
-
-            async function loadFiles(files) {
-                let loaded = 0;
-                const fileArray = Array.from(files);
-                for (const file of fileArray) {
-                    if (file.type !== "application/pdf") {
-                        showToast(`"${file.name}" no es PDF, se omite.`);
-                        continue;
-                    }
-                    try {
-                        const arrayBuffer = await file.arrayBuffer();
-                        const pdf = await pdfjsLib.getDocument({data: arrayBuffer})
-                            .promise;
-                        const numPages = pdf.numPages;
-                        const docId = nextId++;
-                        for (let i = 1; i <= numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            pages.push({
-                                id: nextId++,
-                                docId: docId,
-                                file: file,
-                                name: file.name,
-                                pageNum: i, // número visible (puede cambiar al borrar)
-                                realPageIndex: i - 1, // índice real en el PDF (NO cambia)
-                                totalPages: numPages,
-                                tipo: null,
-                                arrayBuffer: arrayBuffer,
-                                pdfDoc: pdf,
-                                pageObj: page,
-                            });
-                        }
-                        loaded++;
-                    } catch (err) {
-                        showToast(`Error al cargar "${file.name}"`);
-                        console.error(err);
-                    }
-                }
-                if (loaded > 0) {
-                    renderAll();
-                    if (pages.length > 0) selectPage(pages[0].id);
-                    showToast(
-                        `${loaded} documento(s) cargado(s) (${pages.length} páginas).`,
-                    );
-                } else if (fileArray.length > 0) {
-                    showToast("No se pudo cargar ningún PDF.");
-                }
-            }
-
-            // ---- Helper para controlar el loader ----
-            function zipLoaderStart() {
-                const overlay = document.getElementById("zipLoader");
-                const card = overlay.querySelector(".zip-loader-card");
-                const title = document.getElementById("zipLoaderTitle");
-                const msg = document.getElementById("zipLoaderMessage");
-                const bar = document.getElementById("zipProgressBar");
-                const pct = document.getElementById("zipProgressPct");
-                const step = document.getElementById("zipProgressStep");
-
-                card.classList.remove("success");
-                title.textContent = "Generando ZIP…";
-                msg.textContent = "Preparando documentos…";
-                bar.style.width = "0%";
-                pct.textContent = "0%";
-                step.textContent = "Iniciando…";
-
-                overlay.classList.add("show");
-            }
-
-            function zipLoaderUpdate(percent, message) {
-                const bar = document.getElementById("zipProgressBar");
-                const pct = document.getElementById("zipProgressPct");
-                const step = document.getElementById("zipProgressStep");
-                const msg = document.getElementById("zipLoaderMessage");
-
-                const p = Math.max(0, Math.min(100, Math.round(percent)));
-                bar.style.width = p + "%";
-                pct.textContent = p + "%";
-                if (message) {
-                    step.textContent = message;
-                    msg.textContent = message;
-                }
-            }
-
-            function zipLoaderFinish(success, message) {
-                const overlay = document.getElementById("zipLoader");
-                const card = overlay.querySelector(".zip-loader-card");
-                const title = document.getElementById("zipLoaderTitle");
-                const msg = document.getElementById("zipLoaderMessage");
-                const step = document.getElementById("zipProgressStep");
-
-                if (success) {
-                    card.classList.add("success");
-                    document.querySelector("#zipLoader .zip-spinner-icon").textContent =
-                        "✅";
-                    title.textContent = "¡Listo!";
-                    msg.textContent = message || "ZIP generado correctamente";
-                    step.textContent = "Completado";
-                    zipLoaderUpdate(100, "Completado");
-                    setTimeout(() => {
-                        overlay.classList.remove("show");
-                        // resetear icono para la próxima vez
-                        setTimeout(() => {
-                            document.querySelector(
-                                "#zipLoader .zip-spinner-icon",
-                            ).textContent = "📦";
-                        }, 300);
-                    }, 1400);
-                } else {
-                    title.textContent = "Error";
-                    msg.textContent = message || "No se pudo generar el ZIP";
-                    setTimeout(() => overlay.classList.remove("show"), 1600);
-                }
-            }
-            // NIT: solo dígitos
-            nitInput.addEventListener("input", (e) => {
-                const limpio = e.target.value.replace(/\D/g, "");
-                if (e.target.value !== limpio) {
-                    e.target.value = limpio;
-                }
-                e.target.classList.remove("input-error");
-            });
-            // Factura: quitar espacios y limpiar error al escribir
-            facturaInput.addEventListener("input", (e) => {
-                e.target.value = e.target.value.replace(/\s+/g, " ").trimStart();
-                e.target.classList.remove("input-error");
-            });
-            // ---- Función principal con progreso en tiempo real ----
-            async function generarZip() {
-                if (pages.length === 0) {
-                    showToast("No hay páginas para procesar.");
-                    return;
-                }
-
-                const nit = nitInput.value.trim();
-                const factura = facturaInput.value.trim();
-                // ---- VALIDACIONES ----
-                nitInput.classList.remove("input-error");
-                facturaInput.classList.remove("input-error");
-
-                if (!nit) {
-                    nitInput.classList.add("input-error");
-                    nitInput.focus();
-                    showToast("⚠️ Ingresa el NIT antes de generar el ZIP.");
-                    return;
-                }
-                if (!/^\d+$/.test(nit)) {
-                    nitInput.classList.add("input-error");
-                    nitInput.focus();
-                    showToast("⚠️ El NIT solo debe contener números.");
-                    return;
-                }
-                if (!factura) {
-                    facturaInput.classList.add("input-error");
-                    facturaInput.focus();
-                    showToast(
-                        "⚠️ Ingresa el número de factura antes de generar el ZIP.",
-                    );
-                    return;
-                }
-
-                const groups = {};
-                let unassigned = 0;
-                pages.forEach((p) => {
-                    if (!p.tipo) {
-                        unassigned++;
-                        return;
-                    }
-                    if (!groups[p.tipo]) groups[p.tipo] = [];
-                    groups[p.tipo].push(p);
-                });
-
-                if (Object.keys(groups).length === 0) {
-                    showToast("Ninguna página tiene tipo asignado.");
-                    return;
-                }
-
-                if (unassigned > 0) {
-                    const ok = await pedirConfirmacion({
-                        titulo: "Hay páginas sin asignar",
-                        mensaje: `Hay ${unassigned} página(s) sin tipo asignado. ¿Deseas continuar de todas formas?`,
-                        textoOk: "Sí, continuar",
-                        icono: "⚠️",
-                    });
-                    if (!ok) return;
-                }
-
-                // 👇 Arranca la animación
-                zipLoaderStart();
-
-                try {
-                    const zip = new JSZip();
-
-                    // Calcular total de páginas para el progreso real
-                    const totalPaginas = Object.values(groups).reduce(
-                        (sum, arr) => sum + arr.length,
-                        0,
-                    );
-                    let paginasProcesadas = 0;
-
-                    const tipos = Object.keys(groups);
-                    for (let i = 0; i < tipos.length; i++) {
-                        const tipo = tipos[i];
-                        const pagesList = groups[tipo];
-                        pagesList.sort(
-                            (a, b) => a.docId - b.docId || a.pageNum - b.pageNum,
-                        );
-
-                        zipLoaderUpdate(
-                            (paginasProcesadas / totalPaginas) * 100,
-                            `Procesando ${tipo}…`,
-                        );
-
-                        const mergedPdf = await PDFLib.PDFDocument.create();
-                        const docCache = {};
-
-                        for (const p of pagesList) {
-                            if (!docCache[p.docId]) {
-                                try {
-                                    const src = await PDFLib.PDFDocument.load(p.arrayBuffer, {
-                                        ignoreEncryption: true,
-                                    });
-                                    docCache[p.docId] = src;
-                                } catch (err) {
-                                    console.error(`No se pudo cargar ${p.name}:`, err);
-                                    showToast(`⚠️ No se pudo procesar "${p.name}"`);
-                                    continue;
-                                }
-                            }
-                            const srcDoc = docCache[p.docId];
-                            const [copiedPage] = await mergedPdf.copyPages(srcDoc, [
-                                p.realPageIndex ?? p.pageNum - 1,
-                            ]);
-                            mergedPdf.addPage(copiedPage);
-                        }
-
-                        const bytes = await mergedPdf.save();
-                        zip.file(`${tipo}_${nit}_${factura}.pdf`, bytes);
-
-                        // Dar un respiro al navegador para que repinte la UI
-                        await new Promise((r) => setTimeout(r, 30));
-                    }
-
-                    zipLoaderUpdate(98, "Comprimiendo archivos…");
-                    const zipBlob = await zip.generateAsync(
-                        {type: "blob"},
-                        (meta) => {
-                            // meta.percent va de 0 a 100 según JSZip
-                            zipLoaderUpdate(
-                                98 + (meta.percent / 100) * 2,
-                                `Comprimiendo… ${Math.round(meta.percent)}%`,
-                            );
-                        },
-                    );
-
-                    saveAs(zipBlob, `${factura}.zip`);
-
-                    zipLoaderFinish(
-                        true,
-                        `ZIP con ${tipos.length} archivo(s) generado.`,
-                    );
-                    // 🧹 Limpiar todo después de exportar
-                    setTimeout(() => {
-                        pages = [];
-                        selectedPageId = null;
-                        currentPageId = null;
-                        zoomScale = 1.0;
-                        bulkTypeSelect.value = "";
-                        document
-                            .querySelectorAll(".thumb-check")
-                            .forEach((cb) => (cb.checked = false));
-                        renderAll();
-                        showToast("🧹 Listo para un nuevo proceso.");
-                    }, 400);
-                } catch (err) {
-                    console.error(err);
-                    zipLoaderFinish(false, "Ocurrió un error al generar el ZIP.");
-                }
-            }
-
-            async function limpiarTodo() {
-                if (pages.length === 0) return;
-
-                const ok = await pedirConfirmacion({
-                    titulo: "¿Eliminar todo?",
-                    mensaje:
-                        "Se eliminarán todos los PDFs cargados y sus asignaciones.",
-                    textoOk: "Sí, eliminar todo",
-                    icono: "🗑️",
-                });
-                if (!ok) return;
-
-                pages = [];
-                selectedPageId = null;
-                currentPageId = null;
-                renderAll();
-                showToast("Todo limpiado.");
-            }
-            function init() {
-                dropzoneGallery.addEventListener("dragover", (e) => {
-                    e.preventDefault();
-                    dropzoneGallery.style.borderColor = "#0b3b5c";
-                });
-                dropzoneGallery.addEventListener("dragleave", () => {
-                    dropzoneGallery.style.borderColor = "#cbd7e6";
-                });
-                dropzoneGallery.addEventListener("drop", (e) => {
-                    e.preventDefault();
-                    dropzoneGallery.style.borderColor = "#cbd7e6";
-                    if (e.dataTransfer.files.length) loadFiles(e.dataTransfer.files);
-                });
-                dropzoneGallery.addEventListener("click", () => fileInput.click());
-                fileInput.addEventListener("change", () => {
-                    if (fileInput.files.length) loadFiles(fileInput.files);
-                    fileInput.value = "";
-                });
-
-                prevPageBtn.addEventListener("click", () => navigatePages(-1));
-                nextPageBtn.addEventListener("click", () => navigatePages(1));
-                goToPageBtn.addEventListener("click", goToPageNum);
-                goToPageInput.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") goToPageNum();
-                });
-                zoomInBtn.addEventListener("click", () => changeZoom(0.1));
-                zoomOutBtn.addEventListener("click", () => changeZoom(-0.1));
-
-                applyBulkTypeBtn.addEventListener("click", applyBulkType);
-                clearSelectionsBtn.addEventListener("click", clearSelections);
-
-                generarBtn.addEventListener("click", generarZip);
-                limpiarBtn.addEventListener("click", limpiarTodo);
-                facturaInput.addEventListener("input", () => {
-                    const pos = facturaInput.selectionStart;
-                    facturaInput.value = facturaInput.value.toUpperCase();
-                    facturaInput.setSelectionRange(pos, pos);
-                });
-
-                renderAll();
-            }
-            function updateClock() {
-                const now = new Date();
-                const fecha = now.toLocaleDateString("es-CO");
-                const hora = now.toLocaleTimeString("es-CO");
-                const el = document.getElementById("liveClock");
-                if (el) el.textContent = `📅 ${fecha} · 🕐 ${hora}`;
-            }
-            updateClock();
-            setInterval(updateClock, 1000);
-            init();
+          }
+
+          function buscarPorNit(nit) {
+            if (!cargado || !nit) return null;
+            const buscado = String(nit).replace(/\D/g, "");
+            if (!buscado) return null;
+            return lista.find((p) => p._nitLimpio === buscado) || null;
+          }
+
+          return { cargar, buscarPorNit };
         })();
-    </script>
-</body>
+        async function limpiarTodo() {
+          if (pages.length === 0) return;
 
+          const ok = await pedirConfirmacion({
+            titulo: "¿Eliminar todo?",
+            mensaje:
+              "Se eliminarán todos los PDFs cargados y sus asignaciones.",
+            textoOk: "Sí, eliminar todo",
+            icono: "🗑️",
+          });
+          if (!ok) return;
+
+          pages = [];
+          selectedPageId = null;
+          currentPageId = null;
+          renderAll();
+          showToast("Todo limpiado.");
+        }
+        function init() {
+          dropzoneGallery.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropzoneGallery.style.borderColor = "#0b3b5c";
+          });
+          dropzoneGallery.addEventListener("dragleave", () => {
+            dropzoneGallery.style.borderColor = "#cbd7e6";
+          });
+          dropzoneGallery.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropzoneGallery.style.borderColor = "#cbd7e6";
+            if (e.dataTransfer.files.length) loadFiles(e.dataTransfer.files);
+          });
+          dropzoneGallery.addEventListener("click", () => fileInput.click());
+          fileInput.addEventListener("change", () => {
+            if (fileInput.files.length) loadFiles(fileInput.files);
+            fileInput.value = "";
+          });
+
+          prevPageBtn.addEventListener("click", () => navigatePages(-1));
+          nextPageBtn.addEventListener("click", () => navigatePages(1));
+          goToPageBtn.addEventListener("click", goToPageNum);
+          goToPageInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") goToPageNum();
+          });
+          zoomInBtn.addEventListener("click", () => changeZoom(0.1));
+          zoomOutBtn.addEventListener("click", () => changeZoom(-0.1));
+
+          applyBulkTypeBtn.addEventListener("click", applyBulkType);
+          clearSelectionsBtn.addEventListener("click", clearSelections);
+
+          generarBtn.addEventListener("click", generarZip);
+          limpiarBtn.addEventListener("click", limpiarTodo);
+          facturaInput.addEventListener("input", () => {
+            const pos = facturaInput.selectionStart;
+            facturaInput.value = facturaInput.value.toUpperCase();
+            facturaInput.setSelectionRange(pos, pos);
+          });
+
+          renderAll();
+        }
+        /* ====== BUSCADOR DE PRESTADOR POR NIT ====== */
+        const prestadorInfo = document.getElementById("prestadorInfo");
+
+        function actualizarPrestador() {
+          const nit = nitInput.value.trim();
+          if (!nit) {
+            prestadorInfo.textContent = "";
+            prestadorInfo.style.color = "#7a8fa6";
+            return;
+          }
+          const p = PRESTADORES.buscarPorNit(nit);
+          if (p) {
+            prestadorInfo.textContent = `🏥 ${p.nombre_prestador.trim()} · Código: ${p.codigo_prestador}`;
+            prestadorInfo.style.color = "#0b3b5c";
+          } else {
+            prestadorInfo.textContent =
+              "⚠️ NIT no encontrado en la lista de prestadores";
+            prestadorInfo.style.color = "#c0392b";
+          }
+        }
+
+        nitInput.addEventListener("input", actualizarPrestador);
+        nitInput.addEventListener("blur", actualizarPrestador);
+        function updateClock() {
+          const now = new Date();
+          const fecha = now.toLocaleDateString("es-CO");
+          const hora = now.toLocaleTimeString("es-CO");
+          const el = document.getElementById("liveClock");
+          if (el) el.textContent = `📅 ${fecha} · 🕐 ${hora}`;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+        init();
+        // Cargar prestadores en segundo plano
+        PRESTADORES.cargar().then((ok) => {
+          if (!ok) {
+            console.warn("Lista de prestadores no disponible.");
+          } else {
+            // Si ya hay NIT escrito, actualizar de inmediato
+            actualizarPrestador();
+          }
+        });
+      })();
+    </script>
+  </body>
 </html>
