@@ -1967,7 +1967,6 @@
               <button class="zoom-btn" id="zoomInBtn">+</button>
             </div>
           </div>
-
           <div class="gallery">
             <div class="gallery-header">
               <span class="title">📎 Páginas (vista unificada)</span>
@@ -1976,49 +1975,40 @@
                 <input type="file" id="fileInput" accept=".pdf" multiple />
               </div>
             </div>
+
+            <!-- ✅ ÚNICO bloque bulk-actions -->
             <div class="bulk-actions">
               <span style="font-size: 0.8rem; font-weight: 500"
                 >Asignar tipo a seleccionadas:</span
               >
-              <div class="bulk-actions">
-                <span style="font-size: 0.8rem; font-weight: 500"
-                  >Asignar tipo a seleccionadas:</span
+
+              <div class="type-combo" id="typeCombo">
+                <input
+                  type="text"
+                  id="bulkTypeInput"
+                  class="type-combo-input"
+                  placeholder="🔎 Escribe el código o el nombre…"
+                  autocomplete="off"
+                  spellcheck="false"
+                  role="combobox"
+                  aria-expanded="false"
+                  aria-controls="bulkTypeList"
+                />
+                <button
+                  type="button"
+                  class="type-combo-clear"
+                  id="bulkTypeClear"
+                  title="Limpiar"
                 >
-
-                <div class="type-combo" id="typeCombo">
-                  <input
-                    type="text"
-                    id="bulkTypeInput"
-                    class="type-combo-input"
-                    placeholder="🔎 Escribe el código o el nombre…"
-                    autocomplete="off"
-                    spellcheck="false"
-                    role="combobox"
-                    aria-expanded="false"
-                    aria-controls="bulkTypeList"
-                  />
-                  <button
-                    type="button"
-                    class="type-combo-clear"
-                    id="bulkTypeClear"
-                    title="Limpiar"
-                  >
-                    ✕
-                  </button>
-                  <div
-                    class="type-combo-list"
-                    id="bulkTypeList"
-                    role="listbox"
-                  ></div>
-                </div>
-
-                <button class="btn btn-primary" id="applyBulkTypeBtn">
-                  Aplicar
+                  ✕
                 </button>
-                <button class="btn btn-outline" id="clearSelectionsBtn">
-                  Limpiar selección
-                </button>
+                <div
+                  class="type-combo-list"
+                  id="bulkTypeList"
+                  role="listbox"
+                ></div>
               </div>
+
               <button class="btn btn-primary" id="applyBulkTypeBtn">
                 Aplicar
               </button>
@@ -2026,6 +2016,8 @@
                 Limpiar selección
               </button>
             </div>
+            <!-- ✅ fin bloque -->
+
             <div class="thumbnails" id="thumbnailsContainer"></div>
             <div class="gallery-footer">
               <span id="totalDocs">0 páginas</span>
@@ -3156,8 +3148,8 @@
 
           try {
             const zip = new JSZip();
-// 📁 Carpeta con el número de factura dentro del ZIP
-const carpeta = zip.folder(factura);
+            // 📁 Carpeta con el número de factura dentro del ZIP
+            const carpeta = zip.folder(factura);
 
             // Calcular total de páginas para el progreso real
             const totalPaginas = Object.values(groups).reduce(
@@ -3203,7 +3195,7 @@ const carpeta = zip.folder(factura);
               }
 
               const bytes = await mergedPdf.save();
-           carpeta.file(`${tipo}_${nit}_${factura}.pdf`, bytes);
+              carpeta.file(`${tipo}_${nit}_${factura}.pdf`, bytes);
 
               // Dar un respiro al navegador para que repinte la UI
               await new Promise((r) => setTimeout(r, 30));
