@@ -1704,6 +1704,149 @@
         opacity: 1;
         transform: translateY(0);
       }
+      /* ========= COMBO DE TIPO CON BÚSQUEDA ========= */
+      .type-combo {
+        position: relative;
+        flex: 1 1 260px;
+        min-width: 220px;
+      }
+
+      .type-combo-input {
+        width: 100%;
+        padding: 0.42rem 2rem 0.42rem 0.7rem;
+        border: 1.5px solid #d0dbe9;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-family: inherit;
+        background: #ffffff;
+        color: #1f3a57;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+
+      .type-combo-input::placeholder {
+        color: #9db0c6;
+      }
+
+      .type-combo-input:hover {
+        border-color: #a8bdd6;
+      }
+
+      .type-combo-input:focus {
+        outline: none;
+        border-color: #0b3b5c;
+        box-shadow: 0 0 0 3px rgba(11, 59, 92, 0.12);
+      }
+
+      .type-combo-input.input-error {
+        border-color: #c0392b !important;
+        background: #fdeaea;
+        box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+        animation: input-shake 0.3s;
+      }
+
+      .type-combo-input.reset-flash {
+        animation: select-reset 0.6s ease-out;
+      }
+
+      .type-combo-clear {
+        position: absolute;
+        right: 0.35rem;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: #9db0c6;
+        cursor: pointer;
+        font-size: 0.8rem;
+        line-height: 1;
+        padding: 0.2rem 0.3rem;
+        border-radius: 50%;
+        display: none;
+        transition:
+          color 0.15s,
+          background 0.15s;
+      }
+
+      .type-combo.has-value .type-combo-clear {
+        display: block;
+      }
+      .type-combo-clear:hover {
+        color: #c0392b;
+        background: #fdeaea;
+      }
+
+      .type-combo-list {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        max-height: 250px;
+        overflow-y: auto;
+        background: #ffffff;
+        border: 1px solid #dce5f0;
+        border-radius: 12px;
+        box-shadow: 0 14px 34px rgba(11, 42, 64, 0.16);
+        z-index: 60;
+        padding: 0.25rem;
+        display: none;
+      }
+
+      .type-combo.open .type-combo-list {
+        display: block;
+      }
+
+      .type-combo-list::-webkit-scrollbar {
+        width: 5px;
+      }
+      .type-combo-list::-webkit-scrollbar-thumb {
+        background: #cbd7e6;
+        border-radius: 10px;
+      }
+
+      .type-combo-item {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.42rem 0.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.78rem;
+      }
+
+      .type-combo-item:hover,
+      .type-combo-item.active {
+        background: #eef5fd;
+      }
+
+      .type-combo-item .combo-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+      }
+
+      .type-combo-item .combo-code {
+        font-weight: 700;
+        color: #0b3b5c;
+        flex: 0 0 auto;
+        letter-spacing: 0.02em;
+      }
+
+      .type-combo-item .combo-desc {
+        color: #5b6f88;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .type-combo-empty {
+        padding: 0.55rem;
+        font-size: 0.78rem;
+        color: #94a8bd;
+        text-align: center;
+      }
     </style>
   </head>
 
@@ -1837,38 +1980,45 @@
               <span style="font-size: 0.8rem; font-weight: 500"
                 >Asignar tipo a seleccionadas:</span
               >
-              <select id="bulkTypeSelect">
-                <option value="">-- Elegir --</option>
-                <option value="HEV">
-                  Resumen De Atención U Hoja De Evolución(HEV)
-                </option>
-                <option value="EPI">Epicrisis(EPI)</option>
-                <option value="PDX">
-                  Resultado De Los Procedimientos De Apoyo Diagnóstico(PDX)
-                </option>
-                <option value="DQX">Descripción quirurgica(DQX)</option>
-                <option value="RAN">Registro de anestesia(RAN)</option>
-                <option value="CRC">
-                  Comprobante de recibido del usuario(CRC)
-                </option>
-                <option value="TAP">
-                  Traslado asistencial de pacientes(TAP)
-                </option>
-                <option value="TNA">
-                  Transporte no asistencial ambulatorio de la persona(TNA)
-                </option>
-                <option value="FEV">Factura de venta(FEV)</option>
-                <option value="FMO">
-                  Factura de venta de materiales de osteosistesis(FMO)
-                </option>
-                <option value="OPF">
-                  Orden o prescripción facultativa(OPF)
-                </option>
-                <option value="LDP">Lista de precios(LDP)</option>
-                <option value="HAU">Hoja de atención de urgencias(HAU)</option>
-                <option value="HAO">Hoja de anteción ondontológica(HAO)</option>
-                <option value="HAM">Hoja de admon medicamentos(HAM)</option>
-              </select>
+              <div class="bulk-actions">
+                <span style="font-size: 0.8rem; font-weight: 500"
+                  >Asignar tipo a seleccionadas:</span
+                >
+
+                <div class="type-combo" id="typeCombo">
+                  <input
+                    type="text"
+                    id="bulkTypeInput"
+                    class="type-combo-input"
+                    placeholder="🔎 Escribe el código o el nombre…"
+                    autocomplete="off"
+                    spellcheck="false"
+                    role="combobox"
+                    aria-expanded="false"
+                    aria-controls="bulkTypeList"
+                  />
+                  <button
+                    type="button"
+                    class="type-combo-clear"
+                    id="bulkTypeClear"
+                    title="Limpiar"
+                  >
+                    ✕
+                  </button>
+                  <div
+                    class="type-combo-list"
+                    id="bulkTypeList"
+                    role="listbox"
+                  ></div>
+                </div>
+
+                <button class="btn btn-primary" id="applyBulkTypeBtn">
+                  Aplicar
+                </button>
+                <button class="btn btn-outline" id="clearSelectionsBtn">
+                  Limpiar selección
+                </button>
+              </div>
               <button class="btn btn-primary" id="applyBulkTypeBtn">
                 Aplicar
               </button>
@@ -2224,7 +2374,24 @@
           "HAO",
           "HAM",
         ];
-
+        /* Descripciones para el combo con búsqueda */
+        const TIPOS_DESC = {
+          HEV: "Resumen De Atención U Hoja De Evolución",
+          EPI: "Epicrisis",
+          PDX: "Resultado De Los Procedimientos De Apoyo Diagnóstico",
+          DQX: "Descripción quirúrgica",
+          RAN: "Registro de anestesia",
+          CRC: "Comprobante de recibido del usuario",
+          TAP: "Traslado asistencial de pacientes",
+          TNA: "Transporte no asistencial ambulatorio de la persona",
+          FAT: "Factura de venta",
+          FMO: "Factura de venta de materiales de osteosíntesis",
+          OPF: "Orden o prescripción facultativa",
+          LDP: "Lista de precios",
+          HAU: "Hoja de atención de urgencias",
+          HAO: "Hoja de atención odontológica",
+          HAM: "Hoja de administración de medicamentos",
+        };
         let pages = [];
         let selectedPageId = null;
         let currentPageId = null;
@@ -2257,12 +2424,179 @@
         const facturaInput = document.getElementById("facturaInput");
         const generarBtn = document.getElementById("generarBtn");
         const limpiarBtn = document.getElementById("limpiarBtn");
-        const bulkTypeSelect = document.getElementById("bulkTypeSelect");
+        const bulkTypeInput = document.getElementById("bulkTypeInput");
+        const bulkTypeList = document.getElementById("bulkTypeList");
+        const bulkTypeClearBtn = document.getElementById("bulkTypeClear");
+        const typeCombo = document.getElementById("typeCombo");
         const applyBulkTypeBtn = document.getElementById("applyBulkTypeBtn");
         const clearSelectionsBtn =
           document.getElementById("clearSelectionsBtn");
         const toastEl = document.getElementById("toast");
+        let bulkTypeValue = "";
+        let comboIndex = -1;
+        let comboResults = [];
 
+        const normTxt = (s) =>
+          String(s || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        function pintarCombo(filtro = "") {
+          const f = normTxt(filtro).trim();
+          comboResults = TIPOS.filter(
+            (t) =>
+              !f ||
+              normTxt(t).includes(f) ||
+              normTxt(TIPOS_DESC[t]).includes(f),
+          );
+
+          if (comboResults.length === 0) {
+            bulkTypeList.innerHTML =
+              '<div class="type-combo-empty">Sin resultados</div>';
+            comboIndex = -1;
+            return;
+          }
+
+          if (comboIndex >= comboResults.length)
+            comboIndex = comboResults.length - 1;
+
+          bulkTypeList.innerHTML = comboResults
+            .map(
+              (t, i) => `
+      <div class="type-combo-item ${i === comboIndex ? "active" : ""}"
+           data-tipo="${t}" data-index="${i}" role="option">
+        <span class="combo-dot" style="background:${TYPE_COLORS[t] || "#888"}"></span>
+        <span class="combo-code">${t}</span>
+        <span class="combo-desc">${TIPOS_DESC[t]}</span>
+      </div>`,
+            )
+            .join("");
+
+          const activo = bulkTypeList.querySelector(".type-combo-item.active");
+          if (activo) activo.scrollIntoView({ block: "nearest" });
+        }
+
+        function abrirCombo() {
+          typeCombo.classList.add("open");
+          bulkTypeInput.setAttribute("aria-expanded", "true");
+        }
+
+        function cerrarCombo() {
+          typeCombo.classList.remove("open");
+          bulkTypeInput.setAttribute("aria-expanded", "false");
+          comboIndex = -1;
+        }
+
+        function seleccionarTipoCombo(tipo) {
+          bulkTypeValue = tipo;
+          bulkTypeInput.value = `${tipo} · ${TIPOS_DESC[tipo]}`;
+          typeCombo.classList.add("has-value");
+          bulkTypeInput.classList.remove("input-error");
+          cerrarCombo();
+        }
+
+        function limpiarCombo() {
+          bulkTypeValue = "";
+          bulkTypeInput.value = "";
+          typeCombo.classList.remove("has-value");
+          bulkTypeInput.classList.remove("input-error");
+          comboIndex = -1;
+          cerrarCombo();
+        }
+
+        /* Acepta "HEV", "Epicrisis", "EPI · Epicrisis", etc. */
+        function resolverTipo(valor) {
+          const v = normTxt(valor).trim();
+          if (!v) return null;
+          let t = TIPOS.find((x) => normTxt(x) === v);
+          if (t) return t;
+          t = TIPOS.find((x) => normTxt(TIPOS_DESC[x]) === v);
+          if (t) return t;
+          const code = v.split("·")[0].trim();
+          t = TIPOS.find((x) => normTxt(x) === code);
+          return t || null;
+        }
+
+        /* ---- Eventos del combo ---- */
+        bulkTypeInput.addEventListener("focus", () => {
+          pintarCombo("");
+          abrirCombo();
+        });
+
+        bulkTypeInput.addEventListener("input", () => {
+          bulkTypeValue = "";
+          typeCombo.classList.remove("has-value");
+          bulkTypeInput.classList.remove("input-error");
+          comboIndex = 0;
+          pintarCombo(bulkTypeInput.value);
+          abrirCombo();
+        });
+
+        bulkTypeInput.addEventListener("keydown", (e) => {
+          const abierto = typeCombo.classList.contains("open");
+
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (!abierto) {
+              pintarCombo(bulkTypeInput.value);
+              abrirCombo();
+              comboIndex = 0;
+            } else {
+              comboIndex = Math.min(comboResults.length - 1, comboIndex + 1);
+            }
+            pintarCombo(bulkTypeInput.value);
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (!abierto) {
+              pintarCombo(bulkTypeInput.value);
+              abrirCombo();
+            }
+            comboIndex = Math.max(0, comboIndex - 1);
+            pintarCombo(bulkTypeInput.value);
+          } else if (e.key === "Enter") {
+            if (abierto && comboIndex >= 0 && comboResults[comboIndex]) {
+              e.preventDefault();
+              seleccionarTipoCombo(comboResults[comboIndex]);
+            } else {
+              const t = resolverTipo(bulkTypeInput.value);
+              if (t) {
+                e.preventDefault();
+                seleccionarTipoCombo(t);
+              }
+            }
+          } else if (e.key === "Escape") {
+            cerrarCombo();
+          } else if (e.key === "Tab") {
+            cerrarCombo();
+          }
+        });
+
+        bulkTypeList.addEventListener("mousedown", (e) => {
+          const item = e.target.closest(".type-combo-item");
+          if (!item) return;
+          e.preventDefault();
+          seleccionarTipoCombo(item.dataset.tipo);
+          bulkTypeInput.focus();
+        });
+
+        bulkTypeInput.addEventListener("blur", () => {
+          setTimeout(() => {
+            cerrarCombo();
+            if (!bulkTypeValue) {
+              const t = resolverTipo(bulkTypeInput.value);
+              if (t) seleccionarTipoCombo(t);
+            }
+          }, 130);
+        });
+
+        bulkTypeClearBtn.addEventListener("mousedown", (e) =>
+          e.preventDefault(),
+        );
+        bulkTypeClearBtn.addEventListener("click", () => {
+          limpiarCombo();
+          bulkTypeInput.focus();
+        });
         function showToast(msg) {
           toastEl.textContent = msg;
           toastEl.classList.add("show");
@@ -2562,16 +2896,21 @@
         }
 
         function applyBulkType() {
-          const tipo = bulkTypeSelect.value;
+          const tipo = bulkTypeValue || resolverTipo(bulkTypeInput.value);
+
           if (!tipo) {
-            showToast("Selecciona un tipo.");
+            bulkTypeInput.classList.add("input-error");
+            bulkTypeInput.focus();
+            showToast("Escribe o elige un tipo válido.");
             return;
           }
+
           const checkboxes = document.querySelectorAll(".thumb-check:checked");
           if (checkboxes.length === 0) {
             showToast("Selecciona al menos una página.");
             return;
           }
+
           let count = 0;
           checkboxes.forEach((cb) => {
             const id = parseInt(cb.dataset.pageId, 10);
@@ -2581,16 +2920,20 @@
               count++;
             }
           });
+
           document
             .querySelectorAll(".thumb-check")
             .forEach((cb) => (cb.checked = false));
-          bulkTypeSelect.value = "";
-          bulkTypeSelect.classList.remove("reset-flash");
-          void bulkTypeSelect.offsetWidth; // truco para reiniciar la animación
-          bulkTypeSelect.classList.add("reset-flash");
-          setTimeout(() => bulkTypeSelect.classList.remove("reset-flash"), 650);
+
+          limpiarCombo();
+
+          // Pequeño flash verde de confirmación en el input
+          bulkTypeInput.classList.remove("reset-flash");
+          void bulkTypeInput.offsetWidth;
+          bulkTypeInput.classList.add("reset-flash");
+          setTimeout(() => bulkTypeInput.classList.remove("reset-flash"), 650);
+
           renderAll();
-          // animar el contador del tipo asignado
           animarContadorCambiado(tipo);
           showToast(`Tipo ${tipo} asignado a ${count} página(s).`);
         }
@@ -2813,6 +3156,8 @@
 
           try {
             const zip = new JSZip();
+// 📁 Carpeta con el número de factura dentro del ZIP
+const carpeta = zip.folder(factura);
 
             // Calcular total de páginas para el progreso real
             const totalPaginas = Object.values(groups).reduce(
@@ -2858,7 +3203,7 @@
               }
 
               const bytes = await mergedPdf.save();
-              zip.file(`${tipo}_${nit}_${factura}.pdf`, bytes);
+           carpeta.file(`${tipo}_${nit}_${factura}.pdf`, bytes);
 
               // Dar un respiro al navegador para que repinte la UI
               await new Promise((r) => setTimeout(r, 30));
@@ -2888,7 +3233,7 @@
               selectedPageId = null;
               currentPageId = null;
               zoomScale = 1.0;
-              bulkTypeSelect.value = "";
+              limpiarCombo();
               document
                 .querySelectorAll(".thumb-check")
                 .forEach((cb) => (cb.checked = false));
@@ -3029,7 +3374,8 @@
             prestadorInfo.textContent =
               "⚠️ NIT no encontrado en la lista de prestadores";
             prestadorInfo.style.color = "#c0392b";
-            inforp.textContent = "⚠️ NIT no encontrado en la lista de prestadores";
+            inforp.textContent =
+              "⚠️ NIT no encontrado en la lista de prestadores";
             inforp.style.color = "#c0392b";
           }
         }
