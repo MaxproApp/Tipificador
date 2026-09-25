@@ -975,9 +975,22 @@
         min-height: 300px;
       }
 
-      .viewer-container canvas {
-        max-width: 100%;
+      /* Área desplazable del visor. Permite que el zoom sea real,
+         incluso cuando el PDF supera el ancho/alto disponible. */
+      .viewer-canvas-wrap {
+        width: 100%;
         max-height: 60vh;
+        overflow: auto;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 0.25rem;
+      }
+
+      .viewer-container canvas {
+        max-width: none;
+        max-height: none;
+        flex: 0 0 auto;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         background: white;
@@ -1077,6 +1090,22 @@
       .viewer-controls .zoom-btn:active {
         transform: translateY(0);
         box-shadow: 0 2px 6px rgba(11, 59, 92, 0.35);
+      }
+
+      .viewer-controls .rotate-btn {
+        background: linear-gradient(135deg, #1b6b4a 0%, #2a9d6e 100%);
+        color: white;
+        border: none;
+        min-width: 34px;
+        padding: 0.35rem 0.7rem;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(27, 107, 74, 0.25);
+      }
+
+      .viewer-controls .rotate-btn:hover {
+        background: linear-gradient(135deg, #2a9d6e 0%, #348f6b 100%);
       }
 
       .gallery {
@@ -1965,6 +1994,9 @@
               <button class="zoom-btn" id="zoomOutBtn">−</button>
               <span id="zoomLevel" style="font-size: 0.8rem">100%</span>
               <button class="zoom-btn" id="zoomInBtn">+</button>
+              <button class="rotate-btn" id="rotateLeftBtn" title="Girar 90° a la izquierda">↶</button>
+              <span id="rotationLevel" style="font-size: 0.8rem; min-width: 48px; text-align:center">0°</span>
+              <button class="rotate-btn" id="rotateRightBtn" title="Girar 90° a la derecha">↷</button>
             </div>
           </div>
           <div class="gallery">
